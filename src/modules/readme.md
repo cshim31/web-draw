@@ -1,0 +1,1 @@
+Each module contains components that builds the module
