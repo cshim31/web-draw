@@ -1,21 +1,23 @@
+import ImageLoader from "./component/ImageLoader";
+import ImagePicker from "./component/ImagePicker";
+
 const Palette = () => {
 
-    const tools = [];
+    const tools = [
+        <ImageLoader/>,
+        <ImagePicker/>
+    ];
      
 
     return (
-        <div>
-            <div className="flex">
-                {/* set items as props? refer to functional programming and react state management and determine*/}
-                {
-                    tools.map((element) => 
-                            /* create object? or render it on data?*/
-                            <div>
-                                {element}
-                            </div>
-                    )
-                }
-            </div>
+        <div className="absolute left-0 z-50 flex-col w-40 py-8 pl-2">
+            {/* TODO: Let each button trigger click event to specific layer */}
+            {
+                tools.map((element) => 
+                        /* create object? or render it on data?*/
+                        element
+                )
+            }
         </div>
     );
 };

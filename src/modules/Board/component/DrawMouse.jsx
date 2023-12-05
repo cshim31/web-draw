@@ -1,7 +1,8 @@
 import { useRef, useState } from "react";
 import { useMouse } from "react-use";
-import { useEffect } from "react";
+import { useEffect,useContext } from "react";
 import { motion } from 'framer-motion';
+import { DrawContext } from "../../Context/DrawContext";
 
 /*
     Creates a layer for drawing on screen
@@ -12,19 +13,13 @@ import { motion } from 'framer-motion';
 let movedX = [];
 let movedY = [];
 
-const Modes = {
-    Default: 0,
-    Pen: 1,
-    Erase: 2
-}
-
 const DrawMouse = () => {
 
+    const { drawLayer, mode, setMode } = useContext(DrawContext);
     const canvas = useRef(null);
     const {docX, docY, posX, posY, elX, elY, elW, elH} = useMouse(canvas); //??? what is ref used for
     const [isDragging, setDragging] = useState(false);
     const  [isMouseDown, setMouseDown] = useState(false);
-    const [mode, setMode] = useState(Modes.Pen);
 
     let ctx = canvas.current?.getContext("2d");
     
@@ -36,18 +31,19 @@ const DrawMouse = () => {
         } 
 
         switch (mode) {
-            case Modes.Default:
-                break;
-            case Modes.Pen:
+            case 'draw':
                 ctx.strokeStyle = "#000000";
                 ctx.lineWidth = 10;
                 ctx.lineJoin = 'round';
                 ctx.lineCap = 'round';
                 ctx.globalCompositeOperation="source-over";
                 break;
-            case Modes.Erase:
+            case 'erase':
                 ctx.lineWidth = 30;
                 ctx.globalCompositeOperation="destination-out";
+                break;
+            case 'image':
+                break;
             default:
                 break;
         }
@@ -94,7 +90,9 @@ const DrawMouse = () => {
     }
 
     return (
-       <div className="absolute w-full h-full top-0 left-0">
+       <div className="absolute w-full h-full top-0 left-0 z-0"
+       ref={drawLayer}
+       >
         <motion.canvas
             drag={isDragging} 
             onMouseDown={(e) => {
@@ -117,8 +115,7 @@ const DrawMouse = () => {
             width={2000}
             height={2000}
             ref={canvas}
-        >
-        </motion.canvas>
+        />
         </div>
     );
 };

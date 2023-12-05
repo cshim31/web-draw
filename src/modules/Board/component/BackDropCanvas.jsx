@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { useEffect } from "react";
+import { motion } from 'framer-motion';
 
 const BackDropCanvas = () => {
     const canvas = useRef(null);
@@ -27,14 +28,17 @@ const BackDropCanvas = () => {
         }
     });
     
+    {/* TODO: add dragging motion to update grids as you drag */}
     return (
-        <div className="absolute w-full h-full m-0 p-0 overflow-hidden">
+        <motion.div 
+        className="absolute w-full h-full m-0 p-0"
+        >
             <canvas id="grid"
-                    width={2000}
-                    height={2000}
-                    ref={canvas}   
+            width={2000}
+            height={2000}
+            ref={canvas}   
             />
-        </div>
+        </motion.div>
     );
 };
 

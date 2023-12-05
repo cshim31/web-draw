@@ -1,15 +1,13 @@
 import BackDropCanvas from "./component/BackDropCanvas";
-import DrawMouse from "./component/MouseDraw";
+import DrawMouse from "./component/DrawMouse";
 import ImageLayer from "./component/ImageLayer";
-import ComponentLayer from "./component/ComponentLayer";
 
 const Board = () => {
     return (
         <>
             <BackDropCanvas/>
-            <DrawMouse/>
             <ImageLayer/>
-            <ComponentLayer/>
+            <DrawMouse/>
         </>
     )
 };
