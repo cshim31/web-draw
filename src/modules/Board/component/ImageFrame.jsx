@@ -85,7 +85,11 @@ const ImageFrame = ({ imageData }) => {
                 setDragging(false);
             }}
             >
-                <GrTopCorner/>
+                <GrTopCorner
+                style={{
+                    scale: "-1 1"
+                }}
+                />
             </motion.div>
             <motion.div
             className="fixed bottom-0 left-0"
@@ -103,7 +107,11 @@ const ImageFrame = ({ imageData }) => {
                 setDragging(false);
             }}
             >
-                <GrBottomCorner />
+                <GrBottomCorner 
+                style={{
+                    scale: "-1 1"
+                }}
+                />
             </motion.div>
             <motion.div
             className="fixed bottom-0 right-0"
