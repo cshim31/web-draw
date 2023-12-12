@@ -1,6 +1,6 @@
-import { motion } from 'framer-motion';
 import { useContext } from 'react';
 import { DrawContext } from '../../Context/DrawContext';
+import ImageFrame from './ImageFrame';
 /**
  * Creates a layer for uploading and dragging image
  *  
@@ -10,27 +10,18 @@ import { DrawContext } from '../../Context/DrawContext';
 const ImageLayer = () => {
 
     const { imageLayer, imageDatas } = useContext(DrawContext);
-    const loadedImages = loadImage(imageDatas);
+    const loadedImages = loadImages(imageDatas);
 
     {/*generate dragging motion to each image*/ }
-    function loadImage(imageDatas) {
-        if (!imageDatas[0]) return null;
-
+    function loadImages(imageDatas) {
         const result = imageDatas.map((imageData) => 
-            <motion.div
-            className="resize inline-block"
-            drag
-            dragMomentum={false}
-            >
-                <img
-                    className="pointer-events-none"
-                    src={imageData.base64}
-                />
-            </motion.div>
+            <ImageFrame
+                imageData={imageData}
+            />
         );
-
+    
         return result;
-    };
+    }
 
     return (
         <div className="absolute top-0 z-0 cursor-grab"

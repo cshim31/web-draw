@@ -13,14 +13,20 @@ const ImageLoader = () => {
 
                 var reader = new FileReader();
                 reader.onloadend = function() {
-                    setImageDatas(
-                        [
-                            ...imageDatas,
-                            {   
-                                base64: reader.result
-                            }
-                        ]
-                        );
+                    var image = new Image();
+                    image.src = reader.result;
+                    image.onload = function() {
+                        setImageDatas(
+                            [
+                                ...imageDatas,
+                                {   
+                                    base64: image.src,
+                                    width: image.width,
+                                    height: image.height
+                                }
+                            ]
+                        );  
+                    }
                 }
 
                 reader.readAsDataURL(e.target.files[0]);
