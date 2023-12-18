@@ -7,6 +7,7 @@ export const DrawContext = createContext();
 export const DrawContextProvider = ({ children }) => {
     const drawLayer = useRef(null);
     const imageLayer = useRef(null);
+    const drawCanvasRef = useRef(null);
     const [mode, setMode] = useState('draw');
     const [imageDatas, setImageDatas] = useState([]);
  
@@ -15,6 +16,7 @@ export const DrawContextProvider = ({ children }) => {
         value={{
             drawLayer,
             imageLayer,
+            drawCanvasRef,
             imageDatas, 
             mode,
             setMode,

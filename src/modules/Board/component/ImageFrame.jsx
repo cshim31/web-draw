@@ -1,6 +1,7 @@
 import { motion, useMotionValue } from 'framer-motion';
 import { GrTopCorner, GrBottomCorner } from "react-icons/gr";
 import { useCallback, useState } from 'react';
+import { BACKGROUND_SIZE } from '../../../common/constants/backgroundSize';
 
 const ImageFrame = ({ imageData }) => {
     const imageWidth = useMotionValue(imageData.width);
@@ -29,25 +30,38 @@ const ImageFrame = ({ imageData }) => {
     }, []);
 
     const resizeImageFromRight = useCallback((event, info) => {
-        imageHeight.set(imageHeight.get() + info.delta.y);
-        imageWidth.set(imageWidth.get() + info.delta.x);
+        let ratio = Math.max(imageHeight.get(), imageWidth.get()) / Math.min(imageHeight.get(), imageWidth.get());
+
+        if (imageHeight.get() > imageWidth.get()) {
+            imageHeight.set(imageHeight.get() + info.delta.y);
+            imageWidth.set(imageWidth.get() + info.delta.x/ratio);
+        }
+        else if (imageHeight.get() < imageWidth.get()) {
+            imageWidth.set(imageWidth.get() + info.delta.x);
+            imageHeight.set(imageHeight.get() + info.delta.y/ratio);
+        }
+
+        else {
+            imageHeight.set(imageHeight.get() + info.delta.y);
+            imageWidth.set(imageHeight.get() + info.delta.x);
+        }
     }, []);
 
     return (
         <motion.div
-        className="inline-block"
+        className="absolute"
         style={{
-            maxWidth: imageWidth,
-            maxHeight: imageHeight,
+            width: imageWidth,
+            height: imageHeight,
             minHeight: 100,
             minWidth: 100
         }}
         drag
         dragConstraints={{
             left: 50,
-            right: 2000,
+            right: BACKGROUND_SIZE.width,
             top: 50,
-            bottom: 2000
+            bottom: BACKGROUND_SIZE.height
         }}
         dragMomentum={false}
         >
@@ -141,5 +155,3 @@ const ImageFrame = ({ imageData }) => {
 }
 
 export default ImageFrame;
-
-

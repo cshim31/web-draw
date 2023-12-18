@@ -2,6 +2,7 @@ import ImageLoader from "./component/ImageLoader";
 import ImagePicker from "./component/ImagePicker";
 import Draw from "./component/Draw";
 import Eraser from "./component/Eraser";
+import Clear from "./component/Clear";
 
 const Palette = () => {
 
@@ -9,6 +10,7 @@ const Palette = () => {
         <ImageLoader/>,
         <Draw/>,
         <Eraser/>,
+        <Clear/>,
         <ImagePicker/>
     ];
      

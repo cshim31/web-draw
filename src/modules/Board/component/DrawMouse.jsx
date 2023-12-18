@@ -3,6 +3,7 @@ import { useMouse } from "react-use";
 import { useEffect,useContext } from "react";
 import { motion } from 'framer-motion';
 import { DrawContext } from "../../Context/DrawContext";
+import { BACKGROUND_SIZE } from "../../../common/constants/backgroundSize";
 
 /*
     Creates a layer for drawing on screen
@@ -15,17 +16,16 @@ let movedY = [];
 
 const DrawMouse = () => {
 
-    const { drawLayer, mode, setMode } = useContext(DrawContext);
-    const canvas = useRef(null);
-    const {docX, docY, posX, posY, elX, elY, elW, elH} = useMouse(canvas); //??? what is ref used for
+    const { drawLayer, mode, setMode, drawCanvasRef } = useContext(DrawContext);
+    const {docX, docY, posX, posY, elX, elY, elW, elH} = useMouse(drawCanvasRef); //??? what is ref used for
     const [isDragging, setDragging] = useState(false);
     const  [isMouseDown, setMouseDown] = useState(false);
 
-    let ctx = canvas.current?.getContext("2d");
+    let ctx = drawCanvasRef.current?.getContext("2d");
     
 
     useEffect(() => {
-        ctx = canvas.current?.getContext("2d");
+        ctx = drawCanvasRef.current?.getContext("2d");
         if (!ctx) {
             return;
         } 
@@ -44,6 +44,9 @@ const DrawMouse = () => {
                 break;
             case 'image':
                 break;
+            case 'clear':
+                ctx.clearRect(0,0, BACKGROUND_SIZE.width, BACKGROUND_SIZE.height);
+                setMode('draw');
             default:
                 break;
         }
@@ -53,8 +56,8 @@ const DrawMouse = () => {
 
     */
     function handleStartDraw(e) {
-        movedX.push(e.clientX);
-        movedY.push(e.clientY);
+        movedX.push(e.pageX);
+        movedY.push(e.pageY);
         return ;
     }
 
@@ -76,9 +79,7 @@ const DrawMouse = () => {
         
         ctx.beginPath();
         ctx.lineTo(movedX[movedX.length-1],movedY[movedY.length-1]);
-        //console.log("from: x: %s y: %s",movedX[movedX.length-1],movedY[movedY.length-1]);
         ctx.lineTo(x, y);
-        //console.log("to x: %s y: %s", x,y);
         ctx.stroke();
         ctx.closePath();
 
@@ -99,22 +100,22 @@ const DrawMouse = () => {
                 if (e.button === 0) {
                     setMouseDown(true);
                     handleStartDraw(e);
-                    drawLine(e.clientX, e.clientY);
+                    drawLine(e.pageX, e.pageY);
                 } 
             }}
             onMouseUp={(e) => {
                 if (e.button === 0) {
-                    drawLine(e.clientX, e.clientY);
+                    drawLine(e.pageX, e.pageY);
                     setMouseDown(false);
                     handleEndDraw(e);
                 }
             }}
             onMouseMove={(e) => {
-                drawLine(e.clientX, e.clientY);
+                drawLine(e.pageX, e.pageY);
             }}
-            width={2000}
-            height={2000}
-            ref={canvas}
+            width={BACKGROUND_SIZE.width}
+            height={BACKGROUND_SIZE.height}
+            ref={drawCanvasRef}
         />
         </div>
     );
