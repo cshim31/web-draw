@@ -1,1 +1,1 @@
-library, collection of components that can be reused
+collection of components that can be reused

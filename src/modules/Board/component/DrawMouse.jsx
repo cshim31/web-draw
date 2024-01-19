@@ -4,6 +4,18 @@ import { useEffect,useContext } from "react";
 import { motion } from 'framer-motion';
 import { DrawContext } from "../../Context/DrawContext";
 import { BACKGROUND_SIZE } from "../../../common/constants/backgroundSize";
+import { socket } from "../../../common/lib/socket";
+
+let obj = {
+    userID: "sch1261"
+}
+socket.emit("create_room", obj);
+
+let obj2 = {
+    userID: "sch12611",
+    roomID: "8cb3bd9cf8004"
+}
+socket.emit("join_room", obj2);
 
 /*
     Creates a layer for drawing on screen
@@ -14,6 +26,8 @@ import { BACKGROUND_SIZE } from "../../../common/constants/backgroundSize";
 let movedX = [];
 let movedY = [];
 
+
+
 const DrawMouse = () => {
 
     const { drawLayer, mode, setMode, drawCanvasRef } = useContext(DrawContext);
@@ -22,7 +36,7 @@ const DrawMouse = () => {
     const  [isMouseDown, setMouseDown] = useState(false);
 
     let ctx = drawCanvasRef.current?.getContext("2d");
-    
+    setInterval(sendDrawData, 3000);
 
     useEffect(() => {
         ctx = drawCanvasRef.current?.getContext("2d");
@@ -50,7 +64,19 @@ const DrawMouse = () => {
             default:
                 break;
         }
-    });
+    }, [mode]);
+
+
+    useEffect(() => {
+        ctx = drawCanvasRef.current?.getContext("2d");
+        if (!ctx) {
+            return;
+        } 
+
+        socket.on('action', (action) => {
+            ctx.putImageData(action, 0, 0);
+        });
+    })
 
     /*
 
@@ -90,6 +116,25 @@ const DrawMouse = () => {
         return ;
     }
 
+    function sendDrawData() {
+        ctx = drawCanvasRef.current?.getContext("2d");
+        if (!ctx) {
+            return;
+        } 
+
+        /*
+        let roomID = "1";
+        let obj = {
+            "roomID": roomID,
+            "action": ctx.getImageData(0,0,BACKGROUND_SIZE.width, BACKGROUND_SIZE.height)
+        }
+        */
+        
+        socket.emit("action", "hi");
+
+        console.log("Sent draw data");
+    }
+
     return (
        <div className="absolute w-full h-full top-0 left-0 z-0"
        ref={drawLayer}
@@ -97,18 +142,18 @@ const DrawMouse = () => {
         <motion.canvas
             drag={isDragging} 
             onMouseDown={(e) => {
-                if (e.button === 0) {
-                    setMouseDown(true);
-                    handleStartDraw(e);
-                    drawLine(e.pageX, e.pageY);
-                } 
+                if (e.button !== 0) return;
+                
+                setMouseDown(true);
+                handleStartDraw(e);
+                drawLine(e.pageX, e.pageY);
             }}
             onMouseUp={(e) => {
-                if (e.button === 0) {
-                    drawLine(e.pageX, e.pageY);
-                    setMouseDown(false);
-                    handleEndDraw(e);
-                }
+                if (e.button !== 0) return;
+                
+                drawLine(e.pageX, e.pageY);
+                setMouseDown(false);
+                handleEndDraw(e);
             }}
             onMouseMove={(e) => {
                 drawLine(e.pageX, e.pageY);

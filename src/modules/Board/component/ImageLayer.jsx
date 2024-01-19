@@ -14,7 +14,7 @@ const ImageLayer = () => {
 
     {/*generate dragging motion to each image*/ }
     function loadImages(imageDatas) {
-        const result = imageDatas.map((imageData) => 
+        const result = imageDatas.map((imageData, index) => 
             <ImageFrame
                 imageData={imageData}
             />
