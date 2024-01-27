@@ -130,9 +130,9 @@ const DrawMouse = () => {
         }
         */
         
-        socket.emit("action", "hi");
+        //socket.emit("action", "hi");
 
-        console.log("Sent draw data");
+        //console.log("Sent draw data");
     }
 
     return (

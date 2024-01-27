@@ -4,48 +4,59 @@ import { useCallback, useState } from 'react';
 import { BACKGROUND_SIZE } from '../../../common/constants/backgroundSize';
 
 const ImageFrame = ({ imageData }) => {
-    const imageWidth = useMotionValue(imageData.width);
-    const imageHeight = useMotionValue(imageData.height);
+    const [imageWidth, setImageWidth] = useState(imageData.width);
+    const [imageHeight, setImageHeight] = useState(imageData.height);
     
     const [isDragging, setDragging] = useState(false);
 
-    const resizeImageFromLeft = useCallback((event, info) => {
-        let ratio = Math.max(imageHeight.get(), imageWidth.get()) / Math.min(imageHeight.get(), imageWidth.get());
+    /*
+        starting from edge coordinate to middle of the image,
+        save each distance difference to current points
+        if current points are closer to middle of image than prev points
+        then size is shrinking
 
-        if (imageHeight.get() > imageWidth.get()) {
-            imageHeight.set(imageHeight.get() - info.delta.y);
-            imageWidth.set(imageWidth.get() - info.delta.x/ratio);
-        }
-        else if (imageHeight.get() < imageWidth.get()) {
-            imageWidth.set(imageWidth.get() - info.delta.x);
-            imageHeight.set(imageHeight.get() - info.delta.y/ratio);
+    */  
+    const [startX, setStartX] = useState(0);
+    const [startY, setStartY] = useState(0);
+
+    const [prevX, setPrevX] = useState(0);
+    const [prevY, setPrevY] = useState(0);
+
+    const resizeRatio = 1;
+
+    function resizeImageStart(e) {
+        // remove ghost image
+        e.dataTransfer.setDragImage(new Image(), 0, 0);
+        setStartX(e.clientX);
+        setStartY(e.clientY);
+    }
+
+    function resizeImage(e) {
+        let currentX = (startX-e.clientX);
+        let currentY = (startY-e.clientY);
+
+        // shirink if mid-currentX < mid-prevX
+        // becomes shrink if currentX > prevX
+        // extend if mid-currentX > mid-prevX
+        // becomes extend if currentX < prevX
+        if (currentX > prevX) {
+            setImageWidth(imageWidth-Math.floor(Math.abs(currentX - prevX)*resizeRatio));
         }
 
-        else {
-            imageHeight.set(imageHeight.get() - info.delta.y);
-            imageWidth.set(imageHeight.get() - info.delta.x);
+        if (currentX < prevX) {
+            setImageWidth(imageWidth + Math.floor(Math.abs(currentX - prevX)*resizeRatio));
         }
 
-        
-    }, []);
-
-    const resizeImageFromRight = useCallback((event, info) => {
-        let ratio = Math.max(imageHeight.get(), imageWidth.get()) / Math.min(imageHeight.get(), imageWidth.get());
-
-        if (imageHeight.get() > imageWidth.get()) {
-            imageHeight.set(imageHeight.get() + info.delta.y);
-            imageWidth.set(imageWidth.get() + info.delta.x/ratio);
-        }
-        else if (imageHeight.get() < imageWidth.get()) {
-            imageWidth.set(imageWidth.get() + info.delta.x);
-            imageHeight.set(imageHeight.get() + info.delta.y/ratio);
+        if (currentY > prevY) {
+            setImageHeight(imageHeight-Math.floor(Math.abs(currentY - prevY)*resizeRatio));
         }
 
-        else {
-            imageHeight.set(imageHeight.get() + info.delta.y);
-            imageWidth.set(imageHeight.get() + info.delta.x);
+        if (currentY < prevY) {
+            setImageHeight(imageHeight+Math.floor(Math.abs(currentY - prevY)*resizeRatio));
         }
-    }, []);
+        setPrevX(currentX);
+        setPrevY(currentY);
+    }
 
     return (
         <motion.div
@@ -64,92 +75,126 @@ const ImageFrame = ({ imageData }) => {
             bottom: BACKGROUND_SIZE.height
         }}
         dragMomentum={false}
-        >
-            <motion.div
-            className="fixed top-0 left-0"
-            style={{
-                cursor: isDragging? "nw-resize":""
-            }}
-            drag
-            onDrag={resizeImageFromLeft}
-            dragConstraints={{ left: 0, right: 0, top:0, bottom:0 }}
-            dragMomentum={false}
-            onMouseEnter={() => {
-                setDragging(true);
-            }}
-            onMouseLeave={() => {
-                setDragging(false);
-            }}
-            >
-                <GrTopCorner/>
-            </motion.div>
-            <motion.div
-            className="fixed top-0 right-0"
-            style={{
-                cursor: isDragging? "ne-resize":""
-            }}
-            drag
-            onDrag={resizeImageFromRight}
-            dragConstraints={{ left: 0, right: 0, top:0, bottom:0 }}
-            dragMomentum={false}
-            onMouseEnter={() => {
-                setDragging(true);
-            }}
-            onMouseLeave={() => {
-                setDragging(false);
-            }}
-            >
-                <GrTopCorner
+        onDragOver={(e)=> {
+            e.preventDefault()
+            e.stopPropagation()
+        }}
+        >   
+            <div>
+                <div
+                className="absolute top-0 left-0"
                 style={{
-                    scale: "-1 1"
+                    cursor: isDragging? "nw-resize":""
                 }}
-                />
-            </motion.div>
-            <motion.div
-            className="fixed bottom-0 left-0"
-            style={{
-                cursor: isDragging? "sw-resize":""
-            }}
-            drag
-            onDrag={resizeImageFromLeft}
-            dragConstraints={{ left: 0, right: 0, top:0, bottom:0 }}
-            dragMomentum={false}
-            onMouseEnter={() => {
-                setDragging(true);
-            }}
-            onMouseLeave={() => {
-                setDragging(false);
-            }}
-            >
-                <GrBottomCorner 
+                draggable={true}
+                onDragStart={(e) => 
+                    resizeImageStart(e)
+                }
+                onDrag={(e) => {
+                    resizeImage(e)
+                }}
+                onMouseEnter={() => {
+                    setDragging(true);
+                }}
+                onMouseLeave={() => {
+                    setDragging(false);
+                }}
+                >
+                    <GrTopCorner
+                    size={35}
+                    />
+                </div>
+                <div
+                className="absolute top-0 right-0"
                 style={{
-                    scale: "-1 1"
+                    cursor: isDragging? "ne-resize":""
                 }}
-                />
-            </motion.div>
-            <motion.div
-            className="fixed bottom-0 right-0"
-            style={{
-                cursor: isDragging? "se-resize":""
-            }}
-            drag
-            onDrag={resizeImageFromRight}
-            dragConstraints={{ left: 0, right: 0, top:0, bottom:0 }}
-            dragMomentum={false}
-            onMouseEnter={() => {
-                setDragging(true);
-            }}
-            onMouseLeave={() => {
-                setDragging(false);
-            }}
-            >
-                <GrBottomCorner />
-            </motion.div>
-            <img
-                alt="image uploaded"
-                className="rounded-md pointer-events-none"
-                src={imageData.base64}
-            />
+                draggable={true}
+                onDragStart={(e) => 
+                    resizeImageStart(e)
+                }
+                onDrag={(e) => {
+                    resizeImage(e)
+                }}
+                onMouseEnter={() => {
+                    setDragging(true);
+                }}
+                onMouseLeave={() => {
+                    setDragging(false);
+                }}
+                >
+                    <GrTopCorner
+                    size={35}
+                    style={{
+                        scale: "-1 1"
+                    }}
+                    />
+                </div>
+                <div
+                className="absolute bottom-0 left-0"
+                style={{
+                    cursor: isDragging? "sw-resize":""
+                }}
+                draggable={true}
+                onDragStart={(e) => 
+                    resizeImageStart(e)
+                }
+                onDrag={(e) => {
+                    resizeImage(e)
+                }}
+                onMouseEnter={() => {
+                    setDragging(true);
+                }}
+                onMouseLeave={() => {
+                    setDragging(false);
+                }}
+                >
+                    <GrBottomCorner 
+                    size={35}
+                    style={{
+                        scale: "-1 1"
+                    }}
+                    />
+                </div>
+                <div
+                className="absolute bottom-0 right-0"
+                style={{
+                    cursor: isDragging? "se-resize":""
+                }}
+                draggable={true}
+                onDragStart={(e) => 
+                    resizeImageStart(e)
+                }
+                onDrag={(e) => {
+                    resizeImage(e)
+                }}
+                onMouseEnter={() => {
+                    setDragging(true);
+                }}
+                onMouseLeave={() => {
+                    setDragging(false);
+                }}
+                >
+                    <GrBottomCorner
+                    size={35}
+                    />
+                </div>
+                <div>
+                    <img
+                        alt="image uploaded"
+                        className="rounded-md pointer-events-none"
+                        src={imageData.base64}
+                        style={{
+                            width: imageWidth,
+                            height: imageHeight,
+                            minHeight: 100,
+                            minWidth: 100
+                        }}
+                    />
+                </div>
+            </div>
+            
+            
         </motion.div>
     );
 }

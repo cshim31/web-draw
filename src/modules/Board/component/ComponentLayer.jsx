@@ -11,7 +11,8 @@ const ComponentLayer = () => {
 
 
     return (
-        <div className="sticky left-0 flex-col w-40 my-8 ml-2">
+        <div className="sticky left-0 flex-col w-40 my-8 ml-2"
+        >
             {/*give dragging motion to each image uploaded*/ }
             <motion.div>
                 <Palette/>

@@ -4,11 +4,15 @@ import ImageLayer from "./component/ImageLayer";
 
 const Board = () => {
     return (
-        <>
+        <div 
+            onDragOver={(e)=> {
+                e.preventDefault()
+                e.stopPropagation()
+        }}>
             <BackDropCanvas/>
             <ImageLayer/>
             <DrawMouse/>
-        </>
+        </div>
     )
 };
 
