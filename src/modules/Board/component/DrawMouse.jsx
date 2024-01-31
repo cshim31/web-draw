@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { useMouse } from "react-use";
+import { useMouse, useInterval } from "react-use";
 import { useEffect,useContext } from "react";
 import { motion } from 'framer-motion';
 import { DrawContext } from "../../Context/DrawContext";
@@ -13,7 +13,7 @@ socket.emit("create_room", obj);
 
 let obj2 = {
     userID: "sch12611",
-    roomID: "8cb3bd9cf8004"
+    roomID: "8009328d6eed5"
 }
 socket.emit("join_room", obj2);
 
@@ -22,11 +22,19 @@ socket.emit("join_room", obj2);
 
     ref: https://codepen.io/mfosker/pen/ZYgoqG
 */
-
+/*
+    records user draw actions for 0.3 seconds
+{
+    mode (draw, image, erase, clear): {
+        x: [],
+        y: [],
+        canvasProps: CanvasRenderingContext2D,
+    },
+}
+*/
+let canvasMotions = {};
 let movedX = [];
 let movedY = [];
-
-
 
 const DrawMouse = () => {
 
@@ -36,7 +44,10 @@ const DrawMouse = () => {
     const  [isMouseDown, setMouseDown] = useState(false);
 
     let ctx = drawCanvasRef.current?.getContext("2d");
-    setInterval(sendDrawData, 3000);
+
+    useInterval(() => {
+        sendDrawData();
+    }, 1000)
 
     useEffect(() => {
         ctx = drawCanvasRef.current?.getContext("2d");
@@ -50,7 +61,7 @@ const DrawMouse = () => {
                 ctx.lineWidth = 10;
                 ctx.lineJoin = 'round';
                 ctx.lineCap = 'round';
-                ctx.globalCompositeOperation="source-over";
+                ctx.globalCompositeOperation = "source-over";
                 break;
             case 'erase':
                 ctx.lineWidth = 30;
@@ -64,6 +75,8 @@ const DrawMouse = () => {
             default:
                 break;
         }
+        canvasMotions[mode] = getCanvasMotionStructure();
+        canvasMotions[mode].canvasProps = ctx;
     }, [mode]);
 
 
@@ -73,10 +86,21 @@ const DrawMouse = () => {
             return;
         } 
 
-        socket.on('action', (action) => {
-            ctx.putImageData(action, 0, 0);
+        socket.on('action', (newCanvasMotions) => {
+            //
         });
     })
+
+    /*
+
+    */
+    function getCanvasMotionStructure() {
+        return {
+            x: [],
+            y: [],
+            canvasMotions: null
+        };
+    }
 
     /*
 
@@ -91,6 +115,8 @@ const DrawMouse = () => {
 
     */
     function handleEndDraw(e) {
+        canvasMotions[mode].x.push(movedX.slice());
+        canvasMotions[mode].y.push(movedY.slice());
         movedX = [];
         movedY = [];
         return ;
@@ -122,17 +148,12 @@ const DrawMouse = () => {
             return;
         } 
 
-        /*
-        let roomID = "1";
-        let obj = {
-            "roomID": roomID,
-            "action": ctx.getImageData(0,0,BACKGROUND_SIZE.width, BACKGROUND_SIZE.height)
+        // send out and empty canvasMotion data
+        for (const [mode, data] of Object.entries(canvasMotions)) {
+            socket.emit("action", mode, data);
+            data.x = [];
+            data.y = [];
         }
-        */
-        
-        //socket.emit("action", "hi");
-
-        //console.log("Sent draw data");
     }
 
     return (

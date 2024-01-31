@@ -74,7 +74,7 @@ io.on("connection", (socket) => {
     let room = roomMap.get(data.roomID);
     //room.updateDraw(data.action);
     //socket.to(data.roomID).emit("action", data.action);
-    console.log("action sent to %i", data.roomID);
+    console.log("action sent to %s", data.roomID);
   })
 });
 
