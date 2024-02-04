@@ -55,30 +55,10 @@ const DrawMouse = () => {
             return;
         } 
 
-        switch (mode) {
-            case 'draw':
-                ctx.strokeStyle = "#000000";
-                ctx.lineWidth = 10;
-                ctx.lineJoin = 'round';
-                ctx.lineCap = 'round';
-                ctx.globalCompositeOperation = "source-over";
-                break;
-            case 'erase':
-                ctx.lineWidth = 30;
-                ctx.globalCompositeOperation="destination-out";
-                break;
-            case 'image':
-                break;
-            case 'clear':
-                ctx.clearRect(0,0, BACKGROUND_SIZE.width, BACKGROUND_SIZE.height);
-                setMode('draw');
-            default:
-                break;
-        }
+        setMedium(mode);
         canvasMotions[mode] = getCanvasMotionStructure();
         canvasMotions[mode].canvasProps = ctx;
     }, [mode]);
-
 
     useEffect(() => {
         ctx = drawCanvasRef.current?.getContext("2d");
@@ -87,7 +67,14 @@ const DrawMouse = () => {
         } 
 
         socket.on('action', (newCanvasMotions) => {
-            //
+            // need to figure out how to manage data strcture
+            for (const [mode, data] of Object.entries(newCanvasMotions)) {
+                setMedium(mode);
+                
+                for (let i = 1; i < data.x.length; i++) {
+                    drawLine(data.x[i-1], data.y[i-1], data.x[i], data.y[i]);
+                }
+            }
         });
     })
 
@@ -123,21 +110,16 @@ const DrawMouse = () => {
     }
 
 
-    function drawLine(x,y) {
+    function drawLine(prevX, prevY, x, y) {
         if (!ctx || !isMouseDown) {
             return;
         }
-
         
         ctx.beginPath();
-        ctx.lineTo(movedX[movedX.length-1],movedY[movedY.length-1]);
-        ctx.lineTo(x, y);
+        ctx.moveTo(prevX, prevY);
+        ctx.lineTo(x,y);
         ctx.stroke();
         ctx.closePath();
-
-        movedX.push(x);
-        movedY.push(y);
-        
 
         return ;
     }
@@ -156,6 +138,35 @@ const DrawMouse = () => {
         }
     }
 
+    function setMedium(mode) {
+        ctx = drawCanvasRef.current?.getContext("2d");
+        if (!ctx) {
+            return;
+        } 
+
+        switch (mode) {
+            case 'draw':
+                ctx.strokeStyle = "#000000";
+                ctx.lineWidth = 10;
+                ctx.lineJoin = 'round';
+                ctx.lineCap = 'round';
+                ctx.globalCompositeOperation = "source-over";
+                break;
+            case 'erase':
+                ctx.lineWidth = 30;
+                ctx.globalCompositeOperation="destination-out";
+                break;
+            case 'image':
+                break;
+            case 'clear':
+                ctx.clearRect(0,0, BACKGROUND_SIZE.width, BACKGROUND_SIZE.height);
+                setMode('draw');
+            default:
+                break;
+        }
+    }
+
+
     return (
        <div className="absolute w-full h-full top-0 left-0 z-0"
        ref={drawLayer}
@@ -167,17 +178,20 @@ const DrawMouse = () => {
                 
                 setMouseDown(true);
                 handleStartDraw(e);
-                drawLine(e.pageX, e.pageY);
+                drawLine(movedX[movedX.length-1], movedY[movedY.length-1], e.pageX, e.pageY);
             }}
             onMouseUp={(e) => {
                 if (e.button !== 0) return;
                 
-                drawLine(e.pageX, e.pageY);
+                drawLine(movedX[movedX.length-1], movedY[movedY.length-1], e.pageX, e.pageY);
                 setMouseDown(false);
                 handleEndDraw(e);
             }}
             onMouseMove={(e) => {
-                drawLine(e.pageX, e.pageY);
+                drawLine(movedX[movedX.length-1], movedY[movedY.length-1], e.pageX, e.pageY);
+                movedX.push(e.pageX);
+                movedY.push(e.pageY);
+
             }}
             width={BACKGROUND_SIZE.width}
             height={BACKGROUND_SIZE.height}
