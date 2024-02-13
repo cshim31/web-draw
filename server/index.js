@@ -72,9 +72,28 @@ io.on("connection", (socket) => {
   socket.on("action", (data) => {
     console.log("action received");
     let room = roomMap.get(data.roomID);
+
+    switch (data.command) {
+
+      case 'draw_add':
+        room.updateDraw(data);
+        break;
+
+      case 'image_pos':
+        room.updateImage(data);
+        break;
+
+      case 'image_add':
+        room.addImage(data);
+        break;
+
+      default:
+        return ;
+    }
+
     //room.updateDraw(data.action);
     //socket.to(data.roomID).emit("action", data.action);
-    console.log("action sent to %s", data.roomID);
+    console.log("action sent to %i", data.roomID);
   })
 });
 
