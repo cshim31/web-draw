@@ -1,10 +1,14 @@
 import { BsCardImage } from "react-icons/bs";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { DrawContext } from "../../Context/DrawContext";
+import { socket } from "../../../common/lib/socket";
 
 const ImageLoader = () => {
-
     const { imageDatas, setImageDatas } = useContext(DrawContext);
+
+    useEffect(() => {
+        socket.emit("action", "image", imageDatas[imageDatas.length-1]);
+    }, [imageDatas])
 
     const handleInputImage = () => {
         const inputImage = document.getElementById("inputImage");
