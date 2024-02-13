@@ -3,13 +3,41 @@ const ListNode = require('./LinkedList.js');
 
 class Room {
     constructor() {
-        this.drawnData = {};
-        this.imageData = {};
+       /*
+        [
+            {
+                mode: {
+                    props: {},
+                    x: [],
+                    y: [],
+                }
+            }, ...
+        ]
+        */
+        this.drawnData = [];
+
+        /*
+        [
+            {
+                base64: ,
+                width: ,
+                height: ,
+                x: ,
+                y: ,
+            }, ...
+        ]
+        */
+        this.imageData = [];
+
         this.users = new LinkedList();
+        /*
+            Map<socketID, userID>
+        */
+        this.userIDMap = new Map();
     }
 
     get data() {
-        obj = {
+        let obj = {
             'drawnData': this.drawnData,
             'imageData': this.imageData,
             'users': this.users
@@ -18,29 +46,43 @@ class Room {
         return obj;
     } 
 
-    getImageID = (imageBase64) => {
-        return imageBase64.toString(16).slice(2);
-    }
-
-
     updateImage(imageData) {
-        let imageID = this.getImageID(imageData.imageBase64);
-        imageData[imageID] = imageData;
-    }
-
-
-    addDraw(data) {
-        data.forEach((mode) => {
-            // TODO: figure out way to set different props for each drawing
-            // Package props and coordinates (x,y) as an object
-            // Each appended to array in mode
-            drawnData[mode].append(data);
-        })
+        // TODO: Deal with how to update with image based on object structure from client
+        console.log("DEBUG::image update received %s", imageData.index);
+        this.imageData[imageData.index] = imageData.data;
     }
 
     addImage(imageData) {
-        let imageID = this.getImageID(imageData.imageBase64);
-        this.imageData[imageID] = imageData;
+        // TODO: Deal with how to update with image based on object structure from client
+        console.log("DEBUG::image update received");
+        
+        this.imageData.push(imageData);
+        console.log(imageData);
+    }
+
+    isDataValid(drawData) {
+        if (drawData.x.length < 1 && drawData.y.length < 1) {
+            return false;
+        }
+
+        return true;
+    }
+
+    addDraw(drawData) {
+        // TODO: figure out way to set different props for each drawing
+        // Package props and coordinates (x,y) as an object
+        // Each appended to array in mode
+        console.log("DEBUG::draw add received:  %s", JSON.stringify(drawData));
+        
+        for (const [mode, data] of Object.entries(drawData)) {
+            if (this.isDataValid(data)) { 
+                let obj = {};
+                obj[mode] = data;
+                this.drawnData.push(obj);
+            }
+        }
+        
+        console.log(Object.values(this.drawnData));
     }
 
     addUser(userID) {

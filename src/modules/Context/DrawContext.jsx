@@ -10,7 +10,8 @@ export const DrawContextProvider = ({ children }) => {
     const drawCanvasRef = useRef(null);
     const [mode, setMode] = useState('draw');
     const [imageDatas, setImageDatas] = useState([]);
- 
+    const [userID, setUserID] = useState("");
+    const [roomID, setRoomID] = useState("");
     return (
         <DrawContext.Provider 
         value={{
@@ -19,8 +20,12 @@ export const DrawContextProvider = ({ children }) => {
             drawCanvasRef,
             imageDatas, 
             mode,
+            userID,
+            roomID,
             setMode,
-            setImageDatas
+            setImageDatas,
+            setUserID,
+            setRoomID
         }}
         >
             {children}

@@ -6,17 +6,6 @@ import { DrawContext } from "../../Context/DrawContext";
 import { BACKGROUND_SIZE } from "../../../common/constants/backgroundSize";
 import { socket } from "../../../common/lib/socket";
 
-let obj = {
-    userID: "sch1261"
-}
-socket.emit("create_room", obj);
-
-let obj2 = {
-    userID: "sch12611",
-    roomID: "8009328d6eed5"
-}
-socket.emit("join_room", obj2);
-
 /*
     Creates a layer for drawing on screen
 
@@ -32,18 +21,34 @@ socket.emit("join_room", obj2);
     },
 }
 */
+
+// test purpose
+socket.emit("create_room", {userID: "sch1261"});
+
+  
 let canvasMotions = {};
 let movedX = [];
 let movedY = [];
 
 const DrawMouse = () => {
 
-    const { drawLayer, mode, setMode, drawCanvasRef } = useContext(DrawContext);
+    const { drawLayer, mode, setMode, drawCanvasRef, userID, roomID, setRoomID } = useContext(DrawContext);
     const {docX, docY, posX, posY, elX, elY, elW, elH} = useMouse(drawCanvasRef); //??? what is ref used for
     const [isDragging, setDragging] = useState(false);
     const  [isMouseDown, setMouseDown] = useState(false);
 
     let ctx = drawCanvasRef.current?.getContext("2d");
+    
+    // **** test purpose ****
+    /*
+    socket.on("roomid", (roomid) => {
+        console.log(roomid);
+        setRoomID(roomid);
+        socket.emit("join_room", {userID: "sch1261", roomID: roomid})
+    })
+    */
+
+    // ********
 
     useInterval(() => {
         sendDrawData();
@@ -57,7 +62,13 @@ const DrawMouse = () => {
 
         setMedium(mode);
         canvasMotions[mode] = getCanvasMotionStructure();
-        canvasMotions[mode].canvasProps = ctx;
+        canvasMotions[mode].strokeStyle = ctx.strokeStyle;
+        canvasMotions[mode].lineWidth = ctx.lineWidth;
+        canvasMotions[mode].lineJoin = ctx.lineJoin;
+        canvasMotions[mode].lineCap = ctx.lineCap;
+        canvasMotions[mode].globalCompositeOperation = ctx.globalCompositeOperation;
+        
+
     }, [mode]);
 
     useEffect(() => {
@@ -66,7 +77,7 @@ const DrawMouse = () => {
             return;
         } 
 
-        socket.on('action', (newCanvasMotions) => {
+        socket.on('draw_add', (newCanvasMotions) => {
             // need to figure out how to manage data strcture
             for (const [mode, data] of Object.entries(newCanvasMotions)) {
                 setMedium(mode);
@@ -85,7 +96,11 @@ const DrawMouse = () => {
         return {
             x: [],
             y: [],
-            canvasMotions: null
+            strokeStyle: "",
+            lineWidth: "",
+            lineJoin: "",
+            lineCap: "",
+            globalCompositeOperation: ""
         };
     }
 
@@ -131,8 +146,8 @@ const DrawMouse = () => {
         } 
 
         // send out and empty canvasMotion data
+        socket.emit("action", "draw_add", roomID, canvasMotions);
         for (const [mode, data] of Object.entries(canvasMotions)) {
-            socket.emit("action", mode, data);
             data.x = [];
             data.y = [];
         }

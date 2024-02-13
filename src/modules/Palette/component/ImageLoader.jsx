@@ -1,14 +1,10 @@
 import { BsCardImage } from "react-icons/bs";
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import { DrawContext } from "../../Context/DrawContext";
 import { socket } from "../../../common/lib/socket";
 
 const ImageLoader = () => {
-    const { imageDatas, setImageDatas } = useContext(DrawContext);
-
-    useEffect(() => {
-        socket.emit("action", "image", imageDatas[imageDatas.length-1]);
-    }, [imageDatas])
+    const { imageDatas, setImageDatas, roomID } = useContext(DrawContext);
 
     const handleInputImage = () => {
         const inputImage = document.getElementById("inputImage");
@@ -20,16 +16,23 @@ const ImageLoader = () => {
                     var image = new Image();
                     image.src = reader.result;
                     image.onload = function() {
+
+                        let data = {   
+                            base64: image.src,
+                            width: image.width,
+                            height: image.height,
+                            x: 0,
+                            y: 0
+                        };
+
                         setImageDatas(
                             [
                                 ...imageDatas,
-                                {   
-                                    base64: image.src,
-                                    width: image.width,
-                                    height: image.height
-                                }
+                                data
                             ]
-                        );  
+                        );
+                        
+                        socket.emit("action", "image_add", roomID, data);
                     }
                 }
 

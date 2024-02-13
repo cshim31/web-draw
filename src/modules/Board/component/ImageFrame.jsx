@@ -1,17 +1,20 @@
 import { motion, useMotionValue } from 'framer-motion';
 import { GrTopCorner, GrBottomCorner } from "react-icons/gr";
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState,useContext } from 'react';
 import { useInterval } from 'react-use';
+import { DrawContext } from '../../Context/DrawContext';
 import { BACKGROUND_SIZE } from '../../../common/constants/backgroundSize';
 import { socket } from '../../../common/lib/socket';
 
-const ImageFrame = ({ imageData }) => {
+
+const ImageFrame = ({ imageData, index }) => {
+    const { roomID } = useContext(DrawContext);
     const [imageWidth, setImageWidth] = useState(imageData.width);
     const [imageHeight, setImageHeight] = useState(imageData.height);
     
     const [isDragging, setDragging] = useState(false);
-    const x = useMotionValue(0);
-    const y = useMotionValue(0);
+    const x = useMotionValue(imageData.x);
+    const y = useMotionValue(imageData.y);
 
     useInterval(() => {
         sendImageData();
@@ -19,22 +22,29 @@ const ImageFrame = ({ imageData }) => {
 
 
     useEffect(() => {
-        socket.on("action", "imagePos", (newImageMotion) => {
+        socket.on("action", "image_update", (newImageMotion) => {
             x = newImageMotion.x;
             y = newImageMotion.y;
-        })
-
-        socket.on("action", "imageSize", (newImageMotion) => {
             setImageWidth(newImageMotion.imageWidth);
             setImageWidth(newImageMotion.imageHeight);
         })
     })
 
-    // TODO: figure out how to send image position
-    // server will figure out image id based on image base64 data
+    // TODO: Deal with how to update with image based on object structure from client
     function sendImageData() {
-        socket.emit("action", "imagePos", imageData.base64, x, y);
-        socket.emit("action", "imageSize", imageData.base64, imageWidth, imageHeight);
+
+        let data = {
+            index: index,
+            data: {
+                base64: imageData.base64,
+                width: imageWidth,
+                height: imageHeight,
+                x: x,
+                y: y
+            }
+        }
+
+        socket.emit("action", "image_update", roomID, data);
     }
 
     /*

@@ -32,7 +32,7 @@ const roomMap = new Map();
 io.on("connection", (socket) => {
 
   console.log("new connection made");
-  const generateRoomID = () => {
+  const generateID = () => {
     let id = Math.random().toString(16).slice(2);
     while (roomMap.has(id)) {
       id = Math.random().toString(16).slice(2);
@@ -40,60 +40,87 @@ io.on("connection", (socket) => {
     return id;
   };
 
+  const getRoomID = () => {
+    socket.rooms.forEach((roomID) => {
+      if (roomID != socket.id) return socket.id
+    });
+
+    return null;
+  }
+
+
   socket.on("create_room", (data)=> {
-    let roomID = generateRoomID();
+    let roomID = generateID();
     let room = new Room();
     room.addUser(data.userID);
     console.log("room %s now has been created", roomID);
     roomMap.set(roomID, room);
     socket.join(roomID);
+    // test purpose
+    socket.emit("roomid", roomID);
   });
 
   socket.on("join_room", (data) => {
+    console.log("join request received");
+    console.log("roomid: %s", data.roomID);
     if (!roomMap.has(data.roomID)) {
         socket.emit("fail", "Join connection failed/n Invalid room ID");
         return false;
     }
-    let users = roomMap.get(data.roomID).users;
-    // ended here 01/16/2024
-    users.set(data.userID);
+    let room = roomMap.get(data.roomID);
+    room.users.set(data.userID);
+    room.userIDMap.set(socket.id, data.userID);
+
     console.log("user %s has joined room %s", data.userID, data.roomID);
     socket.join(data.roomID);
     socket.to(data.roomID).emit("update", "User has joined");
-    console.log("%i users are in %s room", roomMap.get(data.roomID).users.size(), data.roomID)
+    console.log("%i users are in %s room", room.users.size(), data.roomID)
+
+    // send data to the user joined
+    let server_data = room.data;
+    socket.emit("draw_data", server_data.drawnData);
+    socket.emit("image_data", server_data.imageData);
   });
   
   socket.on("leave_room", (data) => {
-    let users = roomMap.get(data.roomID).users;
-    users.remove(data.userID);
+    let room = roomMap.get(data.roomID);
+    room.users.remove(data.userID);
+    room.userIDMap.delete(socket.id);
     socket.leave(data.roomID);
   })
 
-  socket.on("action", (data) => {
+  socket.on("action", (command, roomID, data) => {
     console.log("action received");
-    let room = roomMap.get(data.roomID);
+    console.log("command: %s, data: %s", command, data);
+    let room = roomMap.get(roomID);
+    console.log("action sent to room: %s", roomID);
+    if (!room) return;
 
-    switch (data.command) {
+    let eventName = "";
+
+    switch (command) {
 
       case 'draw_add':
-        room.updateDraw(data);
+        room.addDraw(data);
+        eventName = "draw_add";
         break;
 
-      case 'image_pos':
-        room.updateImage(data);
-        break;
-
-      case 'image_add':
+      case 'image_add': 
         room.addImage(data);
+        eventName = "image_add";
+        break;
+
+      case 'image_update':
+        room.updateImage(data);
+        eventName = "image_update";
         break;
 
       default:
         return ;
     }
 
-    //room.updateDraw(data.action);
-    //socket.to(data.roomID).emit("action", data.action);
-    console.log("action sent to %i", data.roomID);
+    // Send updates to all clients in the channel
+    socket.broadcast.emit(eventName, data);
   })
 });
 
