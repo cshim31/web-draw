@@ -1,27 +1,22 @@
-import { createRoomId, getRoomId } from "../actions";
+import { createRoomId, joinRoomId } from "../actions";
 
-export async function createRoomAction() {
-    const roomId = await createRoomId();
+export async function action(actionArg) {
+    const formData = await actionArg.request.formData();
+    const formId = formData.get("form-id");
 
-    /* 
-        set room id and send create room request to server
-    */
+    switch (formId) {
+        case "create-room":
+            await createRoomId();
 
-    return { roomId };
-}
+        case "join-room":
+            await joinRoomId(actionArg);
 
-export async function joinRoomAction() {
-    const roomId = await getRoomId();
-
-    if (!roomId) {
-        return 
+        default:
+        // Form was submitted without an id
+        // What to do... throw or return error? Ignore? You decide.
     }
-
-    /* 
-        set room id and send join request to server
-    */
-    return { roomId };
 }
+
 
 export default function Root() {
     return (
