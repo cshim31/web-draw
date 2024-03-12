@@ -1,10 +1,11 @@
 import { createRoomId, joinRoomId } from "../actions";
+import { Form } from "react-router-dom";
 
 export async function action({ request }) {
     console.log("request sent");
     const formData = await request.formData();
     const userName = formData.get("userName");
-
+    console.log("username: %s", userName);
     const roomId = await createRoomId(userName);
 
     return { roomId };
@@ -34,7 +35,7 @@ export default function Root() {
 
                 </div>
                 <div className="my-2.5">
-                    <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" method="post">
+                    <Form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" method="post">
                         <div className="mb-4">
                             <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" name="userName" id="userName" type="text" placeholder="Enter your name"/>
                         </div>
@@ -44,7 +45,7 @@ export default function Root() {
                         </button>
                         </div>
                     
-                    </form>
+                    </Form>
                 </div>
             </div>
         </>

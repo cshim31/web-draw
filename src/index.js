@@ -20,10 +20,6 @@ const router = createBrowserRouter([
     action: rootAction
   },
   {
-    path: "/create-room",
-    action: rootAction
-  },
-  {
     path:"/:roomId",
     element: <App />
   }
