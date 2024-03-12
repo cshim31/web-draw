@@ -1,10 +1,10 @@
-import { createRoomId, joinRoomId } from "../actions";
+import { createRoom } from "../actions";
 import { Form } from "react-router-dom";
 
 export async function action({ request }) {
     const formData = await request.formData();
     const userName = formData.get("userName");
-    const roomId = await createRoomId(userName);
+    const roomId = await createRoom(userName);
 
     return { roomId };
 }
