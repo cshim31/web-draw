@@ -1,15 +1,25 @@
-import { createRoom } from "../actions";
-import { Form } from "react-router-dom";
+import { joinRoom } from "../actions";
+import { Form, useLoaderData } from "react-router-dom";
 
-export async function action({ request }) {
+export async function loader({params}) {
+    const roomId = params.roomId;
+
+    return roomId;
+}
+
+export async function action({ params, request }) {
     const formData = await request.formData();
+    const roomId = params.roomId;
     const userName = formData.get("userName");
     
-    await createRoom(userName);
+    await joinRoom(roomId, userName);
 }
 
 
-export default function Root() {
+export default function JoinPage() {
+
+    const { roomId } = useLoaderData();
+
     return (
         <>
             <div className="max-w-2xl mx-auto">
@@ -38,7 +48,7 @@ export default function Root() {
                         </div>
                         <div className="">
                         <button className="bg-neutral-700 hover:bg-neutral-900 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full" type="submit">
-                            Make Room
+                            Join Room
                         </button>
                         </div>
                     

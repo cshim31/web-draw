@@ -5,16 +5,16 @@ export async function createRoom(userName) {
 
     socket.emit("create_room", {userName: userName});
 
-    socket.once("create_room_id", (roomId) => {
+    socket.once("ack_create_room", (roomId) => {
         return redirect(`/${roomId}`);
     })
 }
 
-export async function joinRoom(userName) {
+export async function joinRoom(roomId, userName) {
 
-    socket.emit("create_room", {userName: userName});
+    socket.emit("join_room", {roomId: roomId, userName: userName});
 
-    socket.once("create_room_id", (roomId) => {
+    socket.once("ack_join", (roomId) => {
         return redirect(`/${roomId}`);
     })
 }

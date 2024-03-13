@@ -3,6 +3,10 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import ErrorPage from './routes/error-page';
+import JoinPage, {
+  action as joinAction,
+  loader as joinLoader
+} from './routes/join-page';
 import reportWebVitals from './reportWebVitals';
 import Root, {
   action as rootAction
@@ -18,6 +22,12 @@ const router = createBrowserRouter([
     element: <Root />,
     errorElement: <ErrorPage />,
     action: rootAction
+  },
+  {
+    path:"/join/:roomId",
+    element: <JoinPage />,
+    action: joinAction,
+    loader: joinLoader
   },
   {
     path:"/:roomId",
