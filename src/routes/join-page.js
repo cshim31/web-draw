@@ -12,7 +12,8 @@ export async function action({ params, request }) {
     const roomId = params.roomId;
     const userName = formData.get("userName");
     
-    await joinRoom(roomId, userName);
+    const response = await joinRoom(roomId, userName);
+    return response;
 }
 
 

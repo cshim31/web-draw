@@ -5,7 +5,8 @@ export async function action({ request }) {
     const formData = await request.formData();
     const userName = formData.get("userName");
     
-    await createRoom(userName);
+    const response = await createRoom(userName);
+    return response;
 }
 
 
