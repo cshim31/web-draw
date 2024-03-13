@@ -1,7 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import App from './App';
+import App, {
+  loader as appLoader
+} from './App';
 import ErrorPage from './routes/error-page';
 import JoinPage, {
   action as joinAction,
@@ -31,7 +33,8 @@ const router = createBrowserRouter([
   },
   {
     path:"/:roomId",
-    element: <App />
+    element: <App />,
+    loader: appLoader
   }
 ]);
 

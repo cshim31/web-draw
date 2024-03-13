@@ -19,8 +19,6 @@ export async function action({ params, request }) {
 
 export default function JoinPage() {
 
-    const { roomId } = useLoaderData();
-
     return (
         <>
             <div className="max-w-2xl mx-auto">
