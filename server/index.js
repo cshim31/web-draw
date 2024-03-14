@@ -56,8 +56,6 @@ io.on("connection", (socket) => {
     console.log("room %s now has been created", roomID);
     roomMap.set(roomID, room);
     socket.join(roomID);
-    // test purpose
-    socket.emit("roomid", roomID);
   });
 
   socket.on("join_room", (data) => {

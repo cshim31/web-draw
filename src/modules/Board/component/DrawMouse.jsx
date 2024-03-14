@@ -22,10 +22,6 @@ import { socket } from "../../../common/lib/socket";
 }
 */
 
-// test purpose
-socket.emit("create_room", {userID: "sch1261"});
-
-  
 let canvasMotions = {};
 let movedX = [];
 let movedY = [];
@@ -39,17 +35,6 @@ const DrawMouse = () => {
 
     let ctx = drawCanvasRef.current?.getContext("2d");
     
-    // **** test purpose ****
-    /*
-    socket.on("roomid", (roomid) => {
-        console.log(roomid);
-        setRoomID(roomid);
-        socket.emit("join_room", {userID: "sch1261", roomID: roomid})
-    })
-    */
-
-    // ********
-
     useInterval(() => {
         sendDrawData();
     }, 1000)
