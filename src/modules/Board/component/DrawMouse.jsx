@@ -6,17 +6,6 @@ import { DrawContext } from "../../Context/DrawContext";
 import { BACKGROUND_SIZE } from "../../../common/constants/backgroundSize";
 import { socket } from "../../../common/lib/socket";
 
-let obj = {
-    userID: "sch1261"
-}
-socket.emit("create_room", obj);
-
-let obj2 = {
-    userID: "sch12611",
-    roomID: "8cb3bd9cf8004"
-}
-socket.emit("join_room", obj2);
-
 /*
     Creates a layer for drawing on screen
 
