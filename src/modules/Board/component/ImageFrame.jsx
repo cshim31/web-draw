@@ -8,7 +8,7 @@ import { socket } from '../../../common/lib/socket';
 
 
 const ImageFrame = ({ imageData, index }) => {
-    const { roomID } = useContext(DrawContext);
+    const { roomId } = useContext(DrawContext);
     const [imageWidth, setImageWidth] = useState(imageData.width);
     const [imageHeight, setImageHeight] = useState(imageData.height);
     
@@ -44,7 +44,7 @@ const ImageFrame = ({ imageData, index }) => {
             }
         }
 
-        socket.emit("action", "image_update", roomID, data);
+        socket.emit("action", "image_update", roomId, data);
     }
 
     /*

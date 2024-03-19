@@ -28,7 +28,7 @@ let movedY = [];
 
 const DrawMouse = () => {
 
-    const { drawLayer, mode, setMode, drawCanvasRef, userID, roomID, setRoomID } = useContext(DrawContext);
+    const { drawLayer, mode, setMode, drawCanvasRef } = useContext(DrawContext);
     const {docX, docY, posX, posY, elX, elY, elW, elH} = useMouse(drawCanvasRef); //??? what is ref used for
     const [isDragging, setDragging] = useState(false);
     const  [isMouseDown, setMouseDown] = useState(false);

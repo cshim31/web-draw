@@ -4,7 +4,7 @@ import { DrawContext } from "../../Context/DrawContext";
 import { socket } from "../../../common/lib/socket";
 
 const ImageLoader = () => {
-    const { imageDatas, setImageDatas, roomID } = useContext(DrawContext);
+    const { imageDatas, setImageDatas, roomId } = useContext(DrawContext);
 
     const handleInputImage = () => {
         const inputImage = document.getElementById("inputImage");
@@ -32,7 +32,7 @@ const ImageLoader = () => {
                             ]
                         );
                         
-                        socket.emit("action", "image_add", roomID, data);
+                        socket.emit("action", "image_add", roomId, data);
                     }
                 }
 
