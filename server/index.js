@@ -33,20 +33,31 @@ io.on("connection", (socket) => {
 
   console.log("new connection made");
   const generateID = () => {
+
     let id = Math.random().toString(16).slice(2);
+
     while (roomMap.has(id)) {
+
       id = Math.random().toString(16).slice(2);
+
     }
+
     return id;
+
   };
 
   const getRoomId = () => {
+
     socket.rooms.forEach((roomId) => {
+
       if (roomId != socket.id) return socket.id
+
     });
 
     return null;
+    
   }
+  
 
 
   socket.on("create_room", (data, sendback)=> {
@@ -54,7 +65,6 @@ io.on("connection", (socket) => {
     let roomId = generateID();
     let room = new Room();
 
-    room.addUser(data.userId);
     roomMap.set(roomId, room);
     socket.join(roomId);
 
@@ -81,13 +91,12 @@ io.on("connection", (socket) => {
     }
     
     let room = roomMap.get(data.roomId);
-    room.users.set(data.userId);
-    room.userIdMap.set(socket.id, data.userId);
+    room.joinUser(socket.id, data.userId);
 
     socket.join(data.roomId);
     socket.to(data.roomId).emit("update", "User has joined");
     console.log("user %s has joined room %s", data.userId, data.roomId);
-    console.log("%i users are in %s room", room.users.size(), data.roomId)
+    console.log("%i users are in %s room", room.userSize, data.roomId)
 
     // respond user with approval
     let response = {
@@ -105,9 +114,7 @@ io.on("connection", (socket) => {
   
   socket.on("leave_room", (data, sendback) => {
 
-    let room = roomMap.get(data.roomId);
-
-    room.users.remove(data.userId);
+    let room = roomMap.get(getRoomId());
     room.userIdMap.delete(socket.id);
     socket.leave(data.roomId);
 
@@ -120,10 +127,8 @@ io.on("connection", (socket) => {
   })
 
   socket.on("action", (command, roomId, data) => {
-    console.log("action received");
-    console.log("command: %s, data: %s", command, data);
-    let room = roomMap.get(roomId);
-    console.log("action sent to room: %s", roomId);
+    let room = roomMap.get(getRoomId());
+
     if (!room) return;
 
     let eventName = "";
