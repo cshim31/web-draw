@@ -55,33 +55,31 @@ io.on("connection", (socket) => {
     });
 
     return null;
-    
+
   }
   
 
 
   socket.on("create_room", (data, sendback)=> {
     
-    let roomId = generateID();
-    let room = new Room();
+    const roomId = generateID();
+    const room = new Room();
 
     roomMap.set(roomId, room);
+    room.joinUser(socket.id, data.userName);
     socket.join(roomId);
 
-    let response = {
+    const response = {
       status: 200,
       roomId: roomId
     };
 
     sendback(response);
-    console.log("room %s now has been created by %s", roomId, data.userId);
+    console.log("room %s now has been created by %s", roomId, data.userName);
     
   });
 
   socket.on("join_room", (data, sendback) => {
-
-    console.log("join request received");
-    console.log("roomId: %s", data.roomId);
 
     if (!roomMap.has(data.roomId)) {
 
@@ -90,36 +88,37 @@ io.on("connection", (socket) => {
 
     }
     
-    let room = roomMap.get(data.roomId);
-    room.joinUser(socket.id, data.userId);
-
+    const room = roomMap.get(data.roomId);
+    room.joinUser(socket.id, data.userName);
     socket.join(data.roomId);
+    
     socket.to(data.roomId).emit("update", "User has joined");
-    console.log("user %s has joined room %s", data.userId, data.roomId);
+    console.log("user %s has joined room %s", data.userName, data.roomId);
     console.log("%i users are in %s room", room.userSize, data.roomId)
 
     // respond user with approval
-    let response = {
+    const roomId = getRoomId();
+    const response = {
       status: 200,
-      roomId: data.roomId
+      roomId: roomId
     };
 
     sendback(response);
 
     // share user room updates
-    let server_data = room.data;
+    const server_data = room.data;
     socket.emit("draw_data", server_data.drawnData);
     socket.emit("image_data", server_data.imageData);
   });
   
   socket.on("leave_room", (data, sendback) => {
 
-    let room = roomMap.get(getRoomId());
-    room.userIdMap.delete(socket.id);
+    const room = roomMap.get(getRoomId());
+    room.userNameMap.delete(socket.id);
     socket.leave(data.roomId);
 
     // respond user with approval
-    let response = {
+    const response = {
       status: 200
     };
 
@@ -127,7 +126,7 @@ io.on("connection", (socket) => {
   })
 
   socket.on("action", (command, roomId, data) => {
-    let room = roomMap.get(getRoomId());
+    const room = roomMap.get(getRoomId());
 
     if (!room) return;
 

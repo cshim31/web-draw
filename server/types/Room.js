@@ -29,7 +29,7 @@ class Room {
         */
         this.imageData = [];
         
-        this.userIdMap = new Map();
+        this.userNameMap = new Map();
     }
 
     get data() {
@@ -45,8 +45,8 @@ class Room {
 
     get userSize() {
 
-        return this.userIdMap.size();
-        
+        return this.userNameMap.size();
+
     }
 
     updateImage(imageData) {
@@ -84,9 +84,9 @@ class Room {
 
     }
 
-    joinUser(socketId, userId) {
+    joinUser(socketId, userName) {
 
-        this.userIdMap.set(socketId, userId);
+        this.userNameMap.set(socketId, userName);
 
     }
 };
