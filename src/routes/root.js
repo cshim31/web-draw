@@ -1,16 +1,21 @@
 import { createRoom } from "../actions";
-import { Form } from "react-router-dom";
+import { Form,
+         useActionData } from "react-router-dom";
+import redirect from "../redirects";
 
 export async function action({ request }) {
     const formData = await request.formData();
     const userName = formData.get("userName");
     
     const response = await createRoom(userName);
-    return response;
+
+    return redirect(response);
 }
 
 
 export default function Root() {
+
+    const error = useActionData();
 
     return (
         <>

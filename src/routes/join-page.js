@@ -1,5 +1,6 @@
 import { joinRoom } from "../actions";
 import { Form, useLoaderData } from "react-router-dom";
+import redirect from "../redirects";
 
 export async function loader({params}) {
     const roomId = params.roomId;
@@ -13,7 +14,7 @@ export async function action({ params, request }) {
     const userName = formData.get("userName");
     
     const response = await joinRoom(roomId, userName);
-    return response;
+    return redirect(response);
 }
 
 
