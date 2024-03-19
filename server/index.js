@@ -53,7 +53,7 @@ io.on("connection", (socket) => {
     let roomID = generateID();
     let room = new Room();
     room.addUser(data.userID);
-    console.log("room %s now has been created", roomID);
+    console.log("room %s now has been created by %s", roomID, data.userID);
     roomMap.set(roomID, room);
     socket.join(roomID);
   });
