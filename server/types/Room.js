@@ -31,9 +31,9 @@ class Room {
 
         this.users = new LinkedList();
         /*
-            Map<socketID, userID>
+            Map<socketId, userId>
         */
-        this.userIDMap = new Map();
+        this.userIdMap = new Map();
     }
 
     get data() {
@@ -85,12 +85,12 @@ class Room {
         console.log(Object.values(this.drawnData));
     }
 
-    addUser(userID) {
-        this.users.set(userID);
+    addUser(userId) {
+        this.users.set(userId);
     }
 
-    removeUser(userID) {
-        this.users.remove(userID);
+    removeUser(userId) {
+        this.users.remove(userId);
     }
 
     

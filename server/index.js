@@ -25,7 +25,7 @@ app.get("/", (req, res) => {
 
 
 /*
-  Map<roomID, Room>
+  Map<roomId, Room>
 */
 const roomMap = new Map();
 
@@ -40,58 +40,90 @@ io.on("connection", (socket) => {
     return id;
   };
 
-  const getRoomID = () => {
-    socket.rooms.forEach((roomID) => {
-      if (roomID != socket.id) return socket.id
+  const getRoomId = () => {
+    socket.rooms.forEach((roomId) => {
+      if (roomId != socket.id) return socket.id
     });
 
     return null;
   }
 
 
-  socket.on("create_room", (data)=> {
-    let roomID = generateID();
+  socket.on("create_room", (data, sendback)=> {
+    
+    let roomId = generateID();
     let room = new Room();
-    room.addUser(data.userID);
-    console.log("room %s now has been created by %s", roomID, data.userID);
-    roomMap.set(roomID, room);
-    socket.join(roomID);
+
+    room.addUser(data.userId);
+    roomMap.set(roomId, room);
+    socket.join(roomId);
+
+    let response = {
+      status: 200,
+      roomId: roomId
+    };
+
+    sendback(response);
+    console.log("room %s now has been created by %s", roomId, data.userId);
+    
   });
 
-  socket.on("join_room", (data) => {
+  socket.on("join_room", (data, sendback) => {
+
     console.log("join request received");
-    console.log("roomid: %s", data.roomID);
-    if (!roomMap.has(data.roomID)) {
+    console.log("roomId: %s", data.roomId);
+
+    if (!roomMap.has(data.roomId)) {
+
         socket.emit("fail", "Join connection failed/n Invalid room ID");
         return false;
+
     }
-    let room = roomMap.get(data.roomID);
-    room.users.set(data.userID);
-    room.userIDMap.set(socket.id, data.userID);
+    
+    let room = roomMap.get(data.roomId);
+    room.users.set(data.userId);
+    room.userIdMap.set(socket.id, data.userId);
 
-    console.log("user %s has joined room %s", data.userID, data.roomID);
-    socket.join(data.roomID);
-    socket.to(data.roomID).emit("update", "User has joined");
-    console.log("%i users are in %s room", room.users.size(), data.roomID)
+    socket.join(data.roomId);
+    socket.to(data.roomId).emit("update", "User has joined");
+    console.log("user %s has joined room %s", data.userId, data.roomId);
+    console.log("%i users are in %s room", room.users.size(), data.roomId)
 
-    // send data to the user joined
+    // respond user with approval
+    let response = {
+      status: 200,
+      roomId: data.roomId
+    };
+
+    sendback(response);
+
+    // share user room updates
     let server_data = room.data;
     socket.emit("draw_data", server_data.drawnData);
     socket.emit("image_data", server_data.imageData);
   });
   
-  socket.on("leave_room", (data) => {
-    let room = roomMap.get(data.roomID);
-    room.users.remove(data.userID);
-    room.userIDMap.delete(socket.id);
-    socket.leave(data.roomID);
+  socket.on("leave_room", (data, sendback) => {
+
+    let room = roomMap.get(data.roomId);
+
+    room.users.remove(data.userId);
+    room.userIdMap.delete(socket.id);
+    socket.leave(data.roomId);
+
+    // respond user with approval
+    let response = {
+      status: 200
+    };
+
+    sendback(response);
   })
 
-  socket.on("action", (command, roomID, data) => {
+  socket.on("action", (command, roomId, data) => {
     console.log("action received");
     console.log("command: %s, data: %s", command, data);
-    let room = roomMap.get(roomID);
-    console.log("action sent to room: %s", roomID);
+    let room = roomMap.get(roomId);
+    console.log("action sent to room: %s", roomId);
     if (!room) return;
 
     let eventName = "";
