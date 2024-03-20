@@ -114,7 +114,7 @@ io.on("connection", (socket) => {
   socket.on("leave_room", (data, sendback) => {
 
     const room = roomMap.get(getRoomId());
-    room.userNameMap.delete(socket.id);
+    room.leave(socket.id);
     socket.leave(data.roomId);
 
     // respond user with approval
@@ -125,7 +125,7 @@ io.on("connection", (socket) => {
     sendback(response);
   })
 
-  socket.on("action", (command, roomId, data) => {
+  socket.on("action", (command, data) => {
     const room = roomMap.get(getRoomId());
 
     if (!room) return;

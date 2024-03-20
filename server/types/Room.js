@@ -89,6 +89,12 @@ class Room {
         this.userNameMap.set(socketId, userName);
 
     }
+
+    leaveUser(socketId) {
+        
+        this.userNameMap.delete(socketId);
+
+    }
 };
 
 module.exports = Room;
