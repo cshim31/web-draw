@@ -3,8 +3,8 @@ const { createServer } = require("node:http");
 const { join } = require("node:path");
 const { Server } = require("socket.io");
 
-const Room = require('./types/Room.js');
-const User = require('./types/User.js');
+const Room = require("./types/Room.js");
+const User = require("./types/User.js");
 
 const app = express();
 const server = createServer(app);
@@ -107,8 +107,8 @@ io.on("connection", (socket) => {
 
     // share user room updates
     const server_data = room.data;
-    socket.emit("draw_data", server_data.drawnData);
-    socket.emit("image_data", server_data.imageData);
+    socket.emit("action", "draw_data", server_data.drawnData);
+    socket.emit("action", "image_data", server_data.imageData);
   });
   
   socket.on("leave_room", (data, sendback) => {
@@ -134,17 +134,17 @@ io.on("connection", (socket) => {
 
     switch (command) {
 
-      case 'draw_add':
+      case "draw_add":
         room.addDraw(data);
         eventName = "draw_add";
         break;
 
-      case 'image_add': 
+      case "image_add": 
         room.addImage(data);
         eventName = "image_add";
         break;
 
-      case 'image_update':
+      case "image_update":
         room.updateImage(data);
         eventName = "image_update";
         break;
@@ -154,7 +154,7 @@ io.on("connection", (socket) => {
     }
 
     // Send updates to all clients in the channel
-    socket.broadcast.emit(eventName, data);
+    socket.broadcast.emit("action", eventName, data);
   })
 });
 

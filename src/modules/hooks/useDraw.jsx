@@ -63,22 +63,22 @@ export default function useDraw() {
         if (isNull(nullableCtx)) return;
 
         switch (mode) {
-            case 'draw':
+            case "draw":
                 nullableCtx.strokeStyle = "#000000";
                 nullableCtx.lineWidth = 10;
-                nullableCtx.lineJoin = 'round';
-                nullableCtx.lineCap = 'round';
+                nullableCtx.lineJoin = "round";
+                nullableCtx.lineCap = "round";
                 nullableCtx.globalCompositeOperation = "source-over";
                 break;
-            case 'erase':
+            case "erase":
                 nullableCtx.lineWidth = 30;
                 nullableCtx.globalCompositeOperation="destination-out";
                 break;
-            case 'image':
+            case "image":
                 break;
-            case 'clear':
+            case "clear":
                 nullableCtx.clearRect(0,0, BACKGROUND_SIZE.width, BACKGROUND_SIZE.height);
-                setMode('draw');
+                setMode("draw");
             default:
                 break;
         }
@@ -122,7 +122,7 @@ export default function useDraw() {
         
         if (isNull(nullableCtx)) return;
 
-        socket.on('draw_add', (drawData) => {
+        socket.on("action", "draw_add", (drawData) => {
             // need to figure out how to manage data strcture
             for (const [mode, data] of Object.entries(drawData)) {
                 setMedium(mode);
