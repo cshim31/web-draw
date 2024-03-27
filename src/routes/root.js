@@ -8,7 +8,7 @@ export async function action({ request }) {
     const userName = formData.get("userName");
     
     const response = await createRoom(userName);
-
+    console.log(response);
     return redirect(response);
 }
 
