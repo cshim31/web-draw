@@ -45,7 +45,7 @@ class Room {
 
     get userSize() {
 
-        return this.userNameMap.size();
+        return this.userNameMap.size;
 
     }
 
