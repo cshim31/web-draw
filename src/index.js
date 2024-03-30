@@ -35,6 +35,10 @@ const router = createBrowserRouter([
     path:"/:roomId",
     element: <App />,
     loader: appLoader
+  },
+  {
+    path:"/test",
+    element: <App />
   }
 ]);
 

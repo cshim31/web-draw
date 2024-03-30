@@ -1,7 +1,8 @@
 import { useContext, useEffect } from 'react';
 import { DrawContext } from '../../Context/DrawContext';
 import ImageFrame from './ImageFrame';
-import { socket } from "../../../common/lib/socket";
+import useImageLayer from '../../hooks/useImageLayer';
+
 /**
  * Creates a layer for uploading and dragging image
  *  
@@ -10,19 +11,10 @@ import { socket } from "../../../common/lib/socket";
 
 const ImageLayer = () => {
 
-    const { imageLayer, imageDatas, setImageDatas } = useContext(DrawContext);
+    const { imageLayer, imageDatas } = useContext(DrawContext);
     const loadedImages = loadImages(imageDatas);
-
-    useEffect(() => {
-        socket.on("image_add", (data) => {
-            setImageDatas(data);
-        });
-
-        socket.on("image_update", (data) => {
-            setImageDatas(data);
-        });
-    })
-
+    useImageLayer();
+    
     {/*generate dragging motion to each image*/ }
     function loadImages(imageDatas) {
         const result = imageDatas.map((imageData, index) => 

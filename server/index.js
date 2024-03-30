@@ -3,8 +3,8 @@ const { createServer } = require("node:http");
 const { join } = require("node:path");
 const { Server } = require("socket.io");
 
-const Room = require('./types/Room.js');
-const User = require('./types/User.js');
+const Room = require("./types/Room.js");
+const User = require("./types/User.js");
 
 const app = express();
 const server = createServer(app);
@@ -33,45 +33,53 @@ io.on("connection", (socket) => {
 
   console.log("new connection made");
   const generateID = () => {
+
     let id = Math.random().toString(16).slice(2);
+
     while (roomMap.has(id)) {
+
       id = Math.random().toString(16).slice(2);
+
     }
+
     return id;
+
   };
 
   const getRoomId = () => {
+
     socket.rooms.forEach((roomId) => {
+
       if (roomId != socket.id) return socket.id
+
     });
 
     return null;
+
   }
+  
 
 
   socket.on("create_room", (data, sendback)=> {
     
-    let roomId = generateID();
-    let room = new Room();
+    const roomId = generateID();
+    const room = new Room();
 
-    room.addUser(data.userId);
     roomMap.set(roomId, room);
+    room.joinUser(socket.id, data.userName);
     socket.join(roomId);
 
-    let response = {
+    const response = {
       status: 200,
       roomId: roomId
     };
 
     sendback(response);
-    console.log("room %s now has been created by %s", roomId, data.userId);
+    console.log("room %s now has been created by %s", roomId, data.userName);
     
   });
 
   socket.on("join_room", (data, sendback) => {
-
-    console.log("join request received");
-    console.log("roomId: %s", data.roomId);
 
     if (!roomMap.has(data.roomId)) {
 
@@ -80,67 +88,63 @@ io.on("connection", (socket) => {
 
     }
     
-    let room = roomMap.get(data.roomId);
-    room.users.set(data.userId);
-    room.userIdMap.set(socket.id, data.userId);
-
+    const room = roomMap.get(data.roomId);
+    room.joinUser(socket.id, data.userName);
     socket.join(data.roomId);
+    
     socket.to(data.roomId).emit("update", "User has joined");
-    console.log("user %s has joined room %s", data.userId, data.roomId);
-    console.log("%i users are in %s room", room.users.size(), data.roomId)
+    console.log("user %s has joined room %s", data.userName, data.roomId);
+    console.log("%i users are in %s room", room.userSize, data.roomId)
 
     // respond user with approval
-    let response = {
+    const roomId = getRoomId();
+    const response = {
       status: 200,
-      roomId: data.roomId
+      roomId: roomId
     };
 
     sendback(response);
 
     // share user room updates
-    let server_data = room.data;
-    socket.emit("draw_data", server_data.drawnData);
-    socket.emit("image_data", server_data.imageData);
+    const server_data = room.data;
+    socket.emit("action", "draw_data", server_data.drawnData);
+    socket.emit("action", "image_data", server_data.imageData);
   });
   
   socket.on("leave_room", (data, sendback) => {
 
-    let room = roomMap.get(data.roomId);
-
-    room.users.remove(data.userId);
-    room.userIdMap.delete(socket.id);
+    const room = roomMap.get(getRoomId());
+    room.leave(socket.id);
     socket.leave(data.roomId);
 
     // respond user with approval
-    let response = {
+    const response = {
       status: 200
     };
 
     sendback(response);
   })
 
-  socket.on("action", (command, roomId, data) => {
-    console.log("action received");
-    console.log("command: %s, data: %s", command, data);
-    let room = roomMap.get(roomId);
-    console.log("action sent to room: %s", roomId);
+  socket.on("action", (command, data) => {
+    const room = roomMap.get(getRoomId());
+
     if (!room) return;
 
     let eventName = "";
 
     switch (command) {
 
-      case 'draw_add':
+      case "draw_add":
         room.addDraw(data);
         eventName = "draw_add";
         break;
 
-      case 'image_add': 
+      case "image_add": 
         room.addImage(data);
         eventName = "image_add";
         break;
 
-      case 'image_update':
+      case "image_update":
         room.updateImage(data);
         eventName = "image_update";
         break;
@@ -150,7 +154,7 @@ io.on("connection", (socket) => {
     }
 
     // Send updates to all clients in the channel
-    socket.broadcast.emit(eventName, data);
+    socket.broadcast.emit("action", eventName, data);
   })
 });
 

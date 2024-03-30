@@ -14,7 +14,8 @@ export async function action({ params, request }) {
     const userName = formData.get("userName");
     
     const response = await joinRoom(roomId, userName);
-    return redirect(response);
+    
+    return response;
 }
 
 

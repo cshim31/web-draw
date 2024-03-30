@@ -1,59 +1,29 @@
-import { motion, useMotionValue } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { GrTopCorner, GrBottomCorner } from "react-icons/gr";
-import { useCallback, useEffect, useState,useContext } from 'react';
-import { useInterval } from 'react-use';
-import { DrawContext } from '../../Context/DrawContext';
+import { useState } from 'react';
 import { BACKGROUND_SIZE } from '../../../common/constants/backgroundSize';
-import { socket } from '../../../common/lib/socket';
-
+import useImage from '../../hooks/useImage';
 
 const ImageFrame = ({ imageData, index }) => {
-    const { roomId } = useContext(DrawContext);
-    const [imageWidth, setImageWidth] = useState(imageData.width);
-    const [imageHeight, setImageHeight] = useState(imageData.height);
     
     const [isDragging, setDragging] = useState(false);
-    const x = useMotionValue(imageData.x);
-    const y = useMotionValue(imageData.y);
 
-    useInterval(() => {
-        sendImageData();
-    }, 1000)
-
-
-    useEffect(() => {
-        socket.on("action", "image_update", (newImageMotion) => {
-            x = newImageMotion.x;
-            y = newImageMotion.y;
-            setImageWidth(newImageMotion.imageWidth);
-            setImageWidth(newImageMotion.imageHeight);
-        })
-    })
-
-    // TODO: Deal with how to update with image based on object structure from client
-    function sendImageData() {
-
-        let data = {
-            index: index,
-            data: {
-                base64: imageData.base64,
-                width: imageWidth,
-                height: imageHeight,
-                x: x,
-                y: y
-            }
-        }
-
-        socket.emit("action", "image_update", roomId, data);
-    }
+    const {
+        x,
+        y,
+        imageWidth,
+        imageHeight,
+        setImageWidth,
+        setImageHeight
+    } = useImage(imageData, index);
 
     /*
         starting from edge coordinate to middle of the image,
         save each distance difference to current points
         if current points are closer to middle of image than prev points
         then size is shrinking
-
     */  
+
     const [startX, setStartX] = useState(0);
     const [startY, setStartY] = useState(0);
 
