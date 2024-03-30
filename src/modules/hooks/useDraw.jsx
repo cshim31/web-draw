@@ -124,6 +124,7 @@ export default function useDraw() {
 
         socket.on("action", "draw_add", (drawData) => {
             // need to figure out how to manage data strcture
+            console.log("action received");
             for (const [mode, data] of Object.entries(drawData)) {
                 setMedium(mode);
                 

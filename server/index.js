@@ -68,7 +68,7 @@ io.on("connection", (socket) => {
     roomMap.set(roomId, room);
     room.joinUser(socket.id, data.userName);
     socket.join(roomId);
-
+    console.log("create room socket id %s", socket.id)
     const response = {
       status: 200,
       roomId: roomId
@@ -126,8 +126,8 @@ io.on("connection", (socket) => {
   })
 
   socket.on("action", (command, data) => {
+    console.log("action socket id %s", socket.id);
     const room = roomMap.get(getRoomId());
-
     if (!room) return;
 
     let eventName = "";
@@ -153,6 +153,7 @@ io.on("connection", (socket) => {
         return ;
     }
 
+    console.log("action received");
     // Send updates to all clients in the channel
     socket.broadcast.emit("action", eventName, data);
   })

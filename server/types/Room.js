@@ -29,6 +29,9 @@ class Room {
         */
         this.imageData = [];
         
+        /*
+            Map<socketId, userName>
+        */
         this.userNameMap = new Map();
     }
 
