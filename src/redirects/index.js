@@ -4,7 +4,7 @@ async function redirect(response) {
     
     switch (status) {
         case 200:
-            window.location.replace("/${response.roomId}");
+            window.location.assign("/${response.roomId}");
             return {status: status, statusText: "Success"};
 
         case 408:

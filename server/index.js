@@ -67,7 +67,7 @@ io.on("connection", (socket) => {
 
     roomMap.set(roomId, room);
     room.joinUser(socket.id, data.userName);
-    socket.join(roomId);
+    //socket.join(roomId);
     console.log("create room socket id %s", socket.id)
     const response = {
       status: 200,
