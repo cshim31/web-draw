@@ -17,6 +17,9 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
+import { DrawContextProvider } from './modules/Context/DrawContext';
+import { WebsocketContextProvider } from "./modules/Context/WebsocketContext";
+
 
 const router = createBrowserRouter([
   {
@@ -45,7 +48,11 @@ const router = createBrowserRouter([
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <WebsocketContextProvider>
+        <DrawContextProvider>
+          <RouterProvider router={router} />
+        </DrawContextProvider>
+    </WebsocketContextProvider>
   </React.StrictMode>
 );
 

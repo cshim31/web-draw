@@ -6,9 +6,10 @@ export async function action({ request }) {
     const formData = await request.formData();
     const userName = formData.get("userName");
     
-    const resopnse = await createRoom(userName);
-    
-    return resopnse;
+    const response = await createRoom(userName);
+    localStorage.setItem('userName', userName);
+
+    return response;
 }
 
 

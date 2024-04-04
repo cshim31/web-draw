@@ -1,19 +1,30 @@
-import { useContext } from "react";
-import { useInterval } from "react-use";
+import { useContext, useEffect } from "react";
 import { DrawContext } from "../Context/DrawContext";
+import { useLoaderData } from "react-router-dom";
 import { socket } from "../../common/lib/socket";
 
 export default function useRoom() {
 
     let response;
+    
+    const loader = useLoaderData(); 
+    const userName = loader["userName"];
+    const roomId = loader["roomId"];
 
-    const { roomId, userName } = useContext(DrawContext);
+    const { setUserName, setRoomId } = useContext(DrawContext);
 
-    useInterval(() => {
+    useEffect(() => {
         socket.emit("join_room", {roomId: roomId, userName: userName}, (response) => {
-            response = response;
+            // TODO: Fix error here
+            //response = response;
+            console.log(response);
         });
-    }, 1000)
+    }, [])
+
+    useEffect(() => {
+        setUserName(userName);
+        setRoomId(roomId);
+    })
 
     return {
         response

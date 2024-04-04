@@ -95,7 +95,6 @@ io.on("connection", (socket) => {
     socket.to(data.roomId).emit("update", "User has joined");
     console.log("user %s has joined room %s", data.userName, data.roomId);
     console.log("%i users are in %s room", room.userSize, data.roomId)
-
     // respond user with approval
     const roomId = getRoomId();
     const response = {

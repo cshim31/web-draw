@@ -1,10 +1,14 @@
 import { joinRoom } from "../actions";
-import { Form, useLoaderData } from "react-router-dom";
+import { Form } from "react-router-dom";
 
-export async function loader({params}) {
+export async function loader({ params, request }) {
     const roomId = params.roomId;
+    const userName = localStorage.getItem("userName");
 
-    return roomId;
+    return {
+        userName: userName, 
+        roomId: roomId
+    };
 }
 
 export async function action({ params, request }) {
@@ -13,6 +17,7 @@ export async function action({ params, request }) {
     const userName = formData.get("userName");
     
     const response = await joinRoom(roomId, userName);
+    localStorage.setItem('userName', userName);
 
     return response;
 }
