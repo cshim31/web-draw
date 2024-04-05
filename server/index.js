@@ -104,10 +104,10 @@ io.on("connection", (socket) => {
 
     sendback(response);
 
-    // share user room updates
+    // share action (drawings and images) recorded by server
     const server_data = room.data;
-    socket.emit("action", "draw_data", server_data.drawnData);
-    socket.emit("action", "image_data", server_data.imageData);
+    //socket.emit("action", "draw_data", server_data.drawnData);
+    //socket.emit("action", "image_data", server_data.imageData);
   });
   
   socket.on("leave_room", (data, sendback) => {
