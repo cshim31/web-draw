@@ -32,7 +32,7 @@ const roomMap = new Map();
 io.on("connection", (socket) => {
 
   console.log("new connection made");
-  const generateID = () => {
+  function generateID() {
 
     let id = Math.random().toString(16).slice(2);
 
@@ -46,28 +46,31 @@ io.on("connection", (socket) => {
 
   };
 
-  const getRoomId = () => {
+  function getRoomId() {
 
-    socket.rooms.forEach((roomId) => {
+    var roomId;
 
-      if (roomId != socket.id) return socket.id
-
+    socket.rooms.forEach((id) => {
+      if (id != socket.id) {
+        roomId = id;
+        return ;
+      }
     });
-
-    return null;
+    
+    return roomId;
 
   }
   
 
 
   socket.on("create_room", (data, sendback)=> {
-    
+
+    // Create room
     const roomId = generateID();
     const room = new Room();
 
     roomMap.set(roomId, room);
-    room.joinUser(socket.id, data.userName);
-    //socket.join(roomId);
+    console.log("create_room roomId %s, room %s", roomId, roomMap.get(roomId));
     console.log("create room socket id %s", socket.id)
     const response = {
       status: 200,
@@ -81,6 +84,7 @@ io.on("connection", (socket) => {
 
   socket.on("join_room", (data, sendback) => {
 
+    // Validate room
     if (!roomMap.has(data.roomId)) {
 
         socket.emit("fail", "Join connection failed/n Invalid room ID");
@@ -88,14 +92,18 @@ io.on("connection", (socket) => {
 
     }
     
+    // Add user to room with info (userName)
     const room = roomMap.get(data.roomId);
     room.joinUser(socket.id, data.userName);
     socket.join(data.roomId);
     
-    socket.to(data.roomId).emit("update", "User has joined");
+    console.log("join_room room socket id %s", socket.id)
+    // Broadcast to all users in room
+    socket.to(data.roomId).emit("join_user", "User has joined");
     console.log("user %s has joined room %s", data.userName, data.roomId);
     console.log("%i users are in %s room", room.userSize, data.roomId)
-    // respond user with approval
+    
+    // Respond user with approval
     const roomId = getRoomId();
     const response = {
       status: 200,
@@ -104,14 +112,16 @@ io.on("connection", (socket) => {
 
     sendback(response);
 
-    // share action (drawings and images) recorded by server
+    // Share action (drawings and images) recorded by server
     const server_data = room.data;
-    //socket.emit("action", "draw_data", server_data.drawnData);
-    //socket.emit("action", "image_data", server_data.imageData);
+    console.log(server_data);
+    socket.emit("draw_add", server_data.drawData);
+    socket.emit("image_add", server_data.imageData);
   });
   
   socket.on("leave_room", (data, sendback) => {
 
+    console.log("leave_room called");
     const room = roomMap.get(getRoomId());
     room.leave(socket.id);
     socket.leave(data.roomId);
@@ -125,8 +135,12 @@ io.on("connection", (socket) => {
   })
 
   socket.on("action", (command, data) => {
-    console.log("action socket id %s", socket.id);
-    const room = roomMap.get(getRoomId());
+    console.log("action %s", command);
+    const roomId = getRoomId();
+    console.log("action roomId %s", roomId);
+    const room = roomMap.get(roomId);
+
+    //console.log(room);
     if (!room) return;
 
     let eventName = "";
@@ -154,7 +168,7 @@ io.on("connection", (socket) => {
 
     console.log("action received");
     // Send updates to all clients in the channel
-    socket.broadcast.emit("action", eventName, data);
+    socket.broadcast.emit(eventName, data);
   })
 });
 

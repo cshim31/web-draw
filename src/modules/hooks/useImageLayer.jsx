@@ -3,16 +3,16 @@ import { socket } from "../../common/lib/socket";
 
 export default function useImageLayer() {
 
-    const { setImageDatas } = useContext;
+    const { imageDatas, setImageDatas } = useContext;
 
 
     useEffect(() => {
-        socket.on("action", "image_add", (data) => {
-            setImageDatas(data);
+        socket.on("image_add", (data) => {
+            setImageDatas(...imageDatas, data);
         });
 
-        socket.on("action", "image_update", (data) => {
-            setImageDatas(data);
+        socket.on("image_update", (data) => {
+            setImageDatas(...imageDatas, data);
         });
     })
 

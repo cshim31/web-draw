@@ -35,7 +35,7 @@ export default function useImage(imageData, index) {
     }, 1000)
 
     useEffect(() => {
-        socket.on("action", "image_update", (newImageMotion) => {
+        socket.on("image_update", (newImageMotion) => {
             x = newImageMotion.x;
             y = newImageMotion.y;
             setImageWidth(newImageMotion.imageWidth);

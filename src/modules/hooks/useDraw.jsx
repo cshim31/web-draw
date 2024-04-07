@@ -122,16 +122,16 @@ export default function useDraw() {
         
         if (isNull(nullableCtx)) return;
 
-        socket.on("action", "draw_add", (drawData) => {
-            // need to figure out how to manage data strcture
-            console.log("action received");
-            for (const [mode, data] of Object.entries(drawData)) {
-                setMedium(mode);
-                
-                for (let i = 1; i < data.x.length; i++) {
-                    drawLine(data.x[i-1], data.y[i-1], data.x[i], data.y[i]);
-                }
-            }
+        socket.on("draw_add", (drawData) => {
+            drawData.forEach((data) => {
+                for (const [mode, val] of Object.entries(data)) {
+                    setMedium(mode);
+                    
+                    for (let i = 1; i < val.x.length; i++) {
+                        drawLine(val.x[i-1], val.y[i-1], val.x[i], val.y[i]);
+                    }
+                }    
+            })
         });
     });
 

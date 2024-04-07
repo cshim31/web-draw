@@ -14,7 +14,7 @@ class Room {
             }, ...
         ]
         */
-        this.drawnData = [];
+        this.drawData = [];
 
         /*
         [
@@ -38,7 +38,7 @@ class Room {
     get data() {
 
         let obj = {
-            'drawnData': this.drawnData,
+            'drawData': this.drawData,
             'imageData': this.imageData
         }
 
@@ -61,7 +61,6 @@ class Room {
     addImage(imageData) {
         
         this.imageData.push(imageData);
-        console.log(imageData);
 
     }
 
@@ -76,12 +75,12 @@ class Room {
     }
 
     addDraw(drawData) {
-        
+        console.log(drawData);
         for (const [mode, data] of Object.entries(drawData)) {
             if (this.isDataValid(data)) { 
                 let obj = {};
                 obj[mode] = data;
-                this.drawnData.push(obj);
+                this.drawData.push(obj);
             }
         }
 

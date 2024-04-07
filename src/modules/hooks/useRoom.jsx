@@ -15,7 +15,6 @@ export default function useRoom() {
 
     useEffect(() => {
         socket.emit("join_room", {roomId: roomId, userName: userName}, (response) => {
-            // TODO: Fix error here
             response = response;
         });
     }, [])
