@@ -34,7 +34,8 @@ const DrawMouse = () => {
         addMove,
         setMouseDown,
         movedX,
-        movedY
+        movedY,
+        isMouseDown
     } = useDraw();
     
     return (
@@ -58,6 +59,7 @@ const DrawMouse = () => {
                 handleEndDraw(e);
             }}
             onMouseMove={(e) => {
+                if (!isMouseDown) return;
                 drawLine(movedX[movedX.length-1], movedY[movedY.length-1], e.pageX, e.pageY);
                 addMove(e.pageX, e.pageY);
             }}

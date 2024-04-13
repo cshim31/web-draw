@@ -60,6 +60,12 @@ io.on("connection", (socket) => {
     return roomId;
 
   }
+
+  function sendDataArr(eventName, dataArr) {
+    dataArr.forEach((data) => {
+      socket.emit(eventName, data);
+    })
+  }
   
 
 
@@ -114,9 +120,8 @@ io.on("connection", (socket) => {
 
     // Share action (drawings and images) recorded by server
     const server_data = room.data;
-    console.log(server_data);
-    socket.emit("draw_add", server_data.drawData);
-    socket.emit("image_add", server_data.imageData);
+    if(server_data.drawData) sendDataArr("draw_add", server_data.drawData);
+    if(server_data.imageData) sendDataArr("image_add", server_data.imageData);
   });
   
   socket.on("leave_room", (data, sendback) => {

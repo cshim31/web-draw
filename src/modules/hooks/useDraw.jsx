@@ -91,8 +91,8 @@ export default function useDraw() {
     }
 
     function handleEndDraw(e) {
-        canvasMotions[mode].x.push(movedX.slice());
-        canvasMotions[mode].y.push(movedY.slice());
+        canvasMotions[mode].x = [...canvasMotions[mode].x, ...movedX];
+        canvasMotions[mode].y = [...canvasMotions[mode].y, ...movedY];
         movedX = [];
         movedY = [];
         return ;
@@ -100,8 +100,8 @@ export default function useDraw() {
 
     function drawLine(prevX, prevY, x, y) {
 
-        if (isNull(nullableCtx) || !isMouseDown) return;
-        
+        if (isNull(nullableCtx)) return;
+
         nullableCtx.beginPath();
         nullableCtx.moveTo(prevX, prevY);
         nullableCtx.lineTo(x,y);
@@ -123,15 +123,14 @@ export default function useDraw() {
         if (isNull(nullableCtx)) return;
 
         socket.on("draw_add", (drawData) => {
-            drawData.forEach((data) => {
-                for (const [mode, val] of Object.entries(data)) {
-                    setMedium(mode);
-                    
-                    for (let i = 1; i < val.x.length; i++) {
-                        drawLine(val.x[i-1], val.y[i-1], val.x[i], val.y[i]);
-                    }
-                }    
-            })
+            
+            for (const [mode, val] of Object.entries(drawData)) {
+                setMedium(mode);
+                console.log(val.x)
+                for (let i = 1; i < val.x.length; i++) {
+                    drawLine(val.x[i-1], val.y[i-1], val.x[i], val.y[i]);
+                }
+            }    
         });
     });
 
@@ -160,6 +159,7 @@ export default function useDraw() {
         addMove,
         setMouseDown,
         movedX,
-        movedY
+        movedY,
+        isMouseDown
     };
 };
