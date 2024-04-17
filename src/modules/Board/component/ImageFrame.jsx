@@ -24,43 +24,57 @@ const ImageFrame = ({ imageData, index }) => {
         then size is shrinking
     */  
 
-    const [startX, setStartX] = useState(0);
-    const [startY, setStartY] = useState(0);
-
     const [prevX, setPrevX] = useState(0);
     const [prevY, setPrevY] = useState(0);
 
     const resizeRatio = 1;
 
+
+    function reduceImageWidth(currentX, prevX) {
+        return imageWidth - Math.floor(Math.abs(currentX - prevX)*resizeRatio);
+    } 
+
+    function reduceImageHeight(currentY, prevY) {
+        return imageHeight - Math.floor(Math.abs(currentY - prevY)*resizeRatio);
+    } 
+
+    function extendImageWidth(currentX, prevX) {
+        return imageWidth + Math.floor(Math.abs(currentX - prevX)*resizeRatio);
+    } 
+
+    function extendImageHeight(currentY, prevY) {
+        return imageHeight + Math.floor(Math.abs(currentY - prevY)*resizeRatio);
+    } 
+
     function resizeImageStart(e) {
         // remove ghost image
         e.dataTransfer.setDragImage(new Image(), 0, 0);
-        setStartX(e.clientX);
-        setStartY(e.clientY);
     }
 
+    
     function resizeImage(e) {
-        let currentX = (startX-e.clientX);
-        let currentY = (startY-e.clientY);
+        const currentX = e.clientX;
+        const currentY = e.clientY;
 
-        // shirink if mid-currentX < mid-prevX
-        // becomes shrink if currentX > prevX
-        // extend if mid-currentX > mid-prevX
-        // becomes extend if currentX < prevX
+        
+        // reduce width if mid-currentX < mid-prevX. The equation becomes reduce if currentX > prevX
         if (currentX > prevX) {
-            setImageWidth(imageWidth-Math.floor(Math.abs(currentX - prevX)*resizeRatio));
+            setImageWidth(extendImageWidth(currentX, prevX));
         }
 
+        // extend width if mid-currentX > mid-prevX. The equation becomes extend if currentX < prevX
         if (currentX < prevX) {
-            setImageWidth(imageWidth + Math.floor(Math.abs(currentX - prevX)*resizeRatio));
+            setImageWidth(reduceImageWidth(currentX, prevX));
         }
-
+        
+        // reduce height if mid-currentY < mid-prevY. The equation becomes reduce if currentY > prevY
         if (currentY > prevY) {
-            setImageHeight(imageHeight-Math.floor(Math.abs(currentY - prevY)*resizeRatio));
+            setImageHeight(extendImageHeight(currentY, prevY));
         }
 
+        // extend height if mid-currentY > mid-prevY. The equation becomes extend if currentY < prevY
         if (currentY < prevY) {
-            setImageHeight(imageHeight+Math.floor(Math.abs(currentY - prevY)*resizeRatio));
+            setImageHeight(reduceImageHeight(currentY, prevY));
         }
         setPrevX(currentX);
         setPrevY(currentY);
