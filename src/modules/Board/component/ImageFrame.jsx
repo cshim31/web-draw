@@ -49,6 +49,10 @@ const ImageFrame = ({ imageData, index }) => {
     function resizeImageStart(e) {
         // remove ghost image
         e.dataTransfer.setDragImage(new Image(), 0, 0);
+
+        // record starting point
+        setPrevX(e.clientX);
+        setPrevY(e.clientY);
     }
 
     
@@ -76,8 +80,15 @@ const ImageFrame = ({ imageData, index }) => {
         if (currentY < prevY) {
             setImageHeight(reduceImageHeight(currentY, prevY));
         }
+        
         setPrevX(currentX);
         setPrevY(currentY);
+    }
+
+    function resizeImageEnd(e) {
+        setPrevX(0);
+        setPrevY(0);
+        console.log("drag")
     }
 
     return (
@@ -111,11 +122,14 @@ const ImageFrame = ({ imageData, index }) => {
                     cursor: isDragging? "nw-resize":""
                 }}
                 draggable={true}
-                onDragStart={(e) => 
+                onDragStart={(e) => {
                     resizeImageStart(e)
-                }
+                }}
                 onDrag={(e) => {
                     resizeImage(e)
+                }}
+                onDragEnd={(e) =>  {
+                    resizeImageEnd(e)
                 }}
                 onMouseEnter={() => {
                     setDragging(true);
@@ -140,6 +154,9 @@ const ImageFrame = ({ imageData, index }) => {
                 onDrag={(e) => {
                     resizeImage(e)
                 }}
+                onDragEnd={(e) => 
+                    resizeImageEnd(e)
+                }
                 onMouseEnter={() => {
                     setDragging(true);
                 }}
@@ -166,6 +183,9 @@ const ImageFrame = ({ imageData, index }) => {
                 onDrag={(e) => {
                     resizeImage(e)
                 }}
+                onDragEnd={(e) => 
+                    resizeImageEnd(e)
+                }
                 onMouseEnter={() => {
                     setDragging(true);
                 }}
@@ -192,6 +212,9 @@ const ImageFrame = ({ imageData, index }) => {
                 onDrag={(e) => {
                     resizeImage(e)
                 }}
+                onDragEnd={(e) => 
+                    resizeImageEnd(e)
+                }
                 onMouseEnter={() => {
                     setDragging(true);
                 }}
