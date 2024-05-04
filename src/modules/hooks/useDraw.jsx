@@ -114,7 +114,7 @@ export default function useDraw() {
 
     useInterval(() => {
         sendDrawData();
-    }, 1000)
+    }, 100)
 
     useEffect(() => {
 

@@ -6,8 +6,8 @@ import { socket } from "../../common/lib/socket";
 
 export default function useImage(imageData, index) {
 
-    const x = useMotionValue(imageData.x);
-    const y = useMotionValue(imageData.y);
+    const [x, setX] = useState(imageData.x);
+    const [y, setY] = useState(imageData.y);
     const [imageWidth, setImageWidth] = useState(imageData.width);
     const [imageHeight, setImageHeight] = useState(imageData.height);
     
@@ -27,7 +27,7 @@ export default function useImage(imageData, index) {
             }
         }
 
-        socket.emit("action", "image_update", roomId, data);
+        socket.emit("action", "image_update", data);
     }
 
     useInterval(() => {
@@ -36,8 +36,8 @@ export default function useImage(imageData, index) {
 
     useEffect(() => {
         socket.on("image_update", (newImageMotion) => {
-            x = newImageMotion.x;
-            y = newImageMotion.y;
+            setX(newImageMotion.x);
+            setY(newImageMotion.y);
             setImageWidth(newImageMotion.imageWidth);
             setImageWidth(newImageMotion.imageHeight);
         })
@@ -48,6 +48,8 @@ export default function useImage(imageData, index) {
         y,
         imageWidth,
         imageHeight,
+        setX,
+        setY,
         setImageWidth,
         setImageHeight
     };

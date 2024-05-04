@@ -31,8 +31,6 @@ const ImageLoader = () => {
                                 data
                             ]
                         );
-                        
-                        socket.emit("action", "image_add", roomId, data);
                     }
                 }
 

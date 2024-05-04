@@ -55,13 +55,11 @@ class Room {
     updateImage(imageData) {
         
         this.imageData[imageData.index] = imageData.data;
-
+        console.log(imageData);
     }
 
     addImage(imageData) {
-        
         this.imageData.push(imageData);
-
     }
 
     isDataValid(drawData) {
@@ -75,7 +73,6 @@ class Room {
     }
 
     addDraw(drawData) {
-        console.log(drawData);
         for (const [mode, data] of Object.entries(drawData)) {
             if (this.isDataValid(data)) { 
                 let obj = {};

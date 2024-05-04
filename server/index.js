@@ -145,7 +145,6 @@ io.on("connection", (socket) => {
     console.log("action roomId %s", roomId);
     const room = roomMap.get(roomId);
 
-    //console.log(room);
     if (!room) return;
 
     let eventName = "";
