@@ -6,6 +6,15 @@ import { socket } from "../../../common/lib/socket";
 const ImageLoader = () => {
     const { imageDatas, setImageDatas, roomId } = useContext(DrawContext);
 
+    const sendAddedImageData = (data) => {
+
+        console.log("send image data in");
+        
+        console.log("sending image data");
+        socket.emit("action", "image_add", data);
+        console.log("sent image data");
+    }
+
     const handleInputImage = () => {
         const inputImage = document.getElementById("inputImage");
         inputImage.addEventListener('change', function(e) {
@@ -31,6 +40,8 @@ const ImageLoader = () => {
                                 data
                             ]
                         );
+
+                        sendAddedImageData(data);
                     }
                 }
 

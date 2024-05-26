@@ -34,22 +34,11 @@ export default function useImage(imageData, index) {
         sendImageData();
     }, 1000)
 
-    useEffect(() => {
-        socket.on("image_update", (newImageMotion) => {
-            setX(newImageMotion.x);
-            setY(newImageMotion.y);
-            setImageWidth(newImageMotion.imageWidth);
-            setImageWidth(newImageMotion.imageHeight);
-        })
-    })
-
     return {
         x,
         y,
         imageWidth,
         imageHeight,
-        setX,
-        setY,
         setImageWidth,
         setImageHeight
     };

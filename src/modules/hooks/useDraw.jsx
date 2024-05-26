@@ -126,7 +126,6 @@ export default function useDraw() {
             
             for (const [mode, val] of Object.entries(drawData)) {
                 setMedium(mode);
-                console.log(val.x)
                 for (let i = 1; i < val.x.length; i++) {
                     drawLine(val.x[i-1], val.y[i-1], val.x[i], val.y[i]);
                 }
