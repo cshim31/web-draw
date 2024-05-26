@@ -17,6 +17,8 @@ export default function useImageLayer() {
                     return data.data;
                 }
 
+                return imageData;
+
             }))
         })
     })
